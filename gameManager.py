@@ -37,6 +37,12 @@ class Game(object):
         self.opponent_agent = opponent_agent
         self._state = None
 
+    def run_batch(self, rounds, initial_state):
+        results = []
+        for i in range(0, rounds):
+            results.append(self.run(initial_state))
+        return results
+
     def run(self, initial_state):
         self._state = initial_state
         self.display.initialize(initial_state)
