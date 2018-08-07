@@ -25,6 +25,7 @@ class GameState(object):
     @property
     def game(self):
         return self.
+
     def get_legal_actions(self, agent_index):
         if agent_index == 0:
             return self.get_agent_legal_actions()
@@ -33,7 +34,7 @@ class GameState(object):
         else:
             raise Exception("illegal agent index.")
 
-
+    #gagagagay
     def get_agent_legal_actions(self):
         "returns all of the legal moves of the current player.todo implement get_all_moves in group class"
         legal_actions = []
