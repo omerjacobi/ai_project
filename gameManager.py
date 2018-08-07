@@ -4,14 +4,9 @@ from enum import Enum
 
 import numpy as np
 import time
+import config
+import tk as abaloneTk
 
-
-class Action():
-    STOP = 5
-
-    def __init__(self, group, direction):
-        self.group = group
-        self.direction = direction
 
 
 class Agent(object):
@@ -33,7 +28,7 @@ class RandomOpponentAgent(Agent):
 
 class Game(object):
     def __init__(self, agent, opponent_agent, display, sleep_between_actions=False):
-        super(Game, self).__init__()
+        super(Game, self).__init__() #todo is it ok to call super game ?maybe change the name of class to gamemanager???
         self.sleep_between_actions = sleep_between_actions
         self.agent = agent
         self.display = display
@@ -49,6 +44,8 @@ class Game(object):
     def run(self, initial_state):
         self._state = initial_state
         self.display.initialize(initial_state)
+        tk = abaloneTk.Game()
+        tk.start(config.Players.Black.positions, config.Players.White.positions)
         return self._game_loop()
 
     def _game_loop(self):
@@ -59,7 +56,7 @@ class Game(object):
             action = self.agent.get_action(self._state)
             if action == Action.STOP:
                 return
-            self._state.apply_action(action)
+            self._state.apply_action(action,self.display)
             if self._state.is_final_state():
                 return                                          # TODO: Think about what this should return
             opponent_action = self.opponent_agent.get_action(self._state)

@@ -1,5 +1,6 @@
 import argparse
 import numpy
+# from gameState import GameState
 # import os
 # from game import Game, RandomOpponentAgent
 # from game_state import GameState
@@ -12,10 +13,7 @@ import numpy
 
 import config
 
-import tk as abaloneTk
-tk=abaloneTk.Game()
-tk.start(config.Players.Black.positions,config.Players.White.positions)
-tk.mainloop()
+
 
 # class GameRunner(object):
 #     def __init__(self, display=None, agent=None, num_of_initial_tiles=NUM_OF_INITIAL_TILES,

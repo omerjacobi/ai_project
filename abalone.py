@@ -15,15 +15,17 @@
 
 '''Game logic of Abalone'''
 
+
 from operator import add, sub
 from gettext import gettext as _
-
+import Action
 from library import NoNegIndexList, Reductors
 
 #representation of teams.
 #NOTE: they can't be 0.
 BLACK = 1
 WHITE = -1
+BOTH=2
 
 class Matrix(list):
     '''Matrix() -> list with all the positions of an abalone's board.'''
@@ -64,7 +66,10 @@ class MarbleManager(list):
         owner key == owner.
         
         owner -> BLACK or WHITE'''
+        if(owner==BOTH):
+            return [self]
         return [ marble for marble in self if marble['owner'] == owner ]
+
 
 class Group(list):
     '''Group(Marbles) -> list of Marble objects with special methods
@@ -276,7 +281,8 @@ class Game(object):
         action_list=[]
         for i in range(0, 6):
             try:
-                action_list+=self.is_valid_move(group,i)
-            except None:
+                if(self.is_valid_move(group,i)):
+                    action_list += Action(group, i)
+            except :
                 print("in exception")
 

@@ -1,8 +1,10 @@
 import itertools
 import numpy as np
-import abalone
 from abalone import Group
-from gameManager import Action
+import Action
+import config
+
+
 
 class GameState(object):
     def __init__(self,curPlayer,game,board=None,score=0,done=False):
@@ -11,6 +13,7 @@ class GameState(object):
         self._score=score
         self._board=board
         self._game=game
+
         self._currentPlayer=curPlayer
         self.is_terminal = False
 
@@ -42,7 +45,7 @@ class GameState(object):
     def get_agent_legal_actions(self):
         "returns all of the legal moves of the current player.todo implement get_all_moves in group class"
         legal_actions = []
-        player_marbles=self._board.getPlayerMarbles(self._currentPlayer)
+        player_marbles=self.game.marbles.get_owner(self._currentPlayer)
         for i in range(0,4):
             for subset in itertools.combinations(player_marbles,i):
                 group=Group(subset)
@@ -55,13 +58,16 @@ class GameState(object):
         return np.where(self._board == 0)
 
 
-    def apply_action(self, action):
-        self.game.move(action.group,action.direction)
+    def apply_action(self, action,display=None):
+        if display:
+            display.move(action.group,action.direction)
+        else:
+            self.game.move(action.group,action.direction)
         looser = self.game.get_looser()
         self.is_terminal = True if looser else False
 
 
-    def generate_successor(self, agent_index=1, action=Action.STOP):
+    def generate_successor(self, agent_index=1, action=5):
         agent_index=agent_index*(-1)
         successor = GameState(agent_index,self._game)#todo more inputs.
         if agent_index == 1:
@@ -75,3 +81,10 @@ class GameState(object):
     def is_final_state(self):
         return self.is_terminal
 #
+
+import tk as abaloneTk
+tk=abaloneTk.Game()
+tk.start(config.Players.Black.positions,config.Players.White.positions)
+g=GameState(1,tk)
+act_list=g.get_agent_legal_actions()
+tk.mainloop()
