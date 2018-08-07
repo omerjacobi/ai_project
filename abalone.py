@@ -111,6 +111,8 @@ class Group(list):
 
         return True
 
+
+
 class Logic(Matrix):
     '''Logic() -> group of methods with the game logic of abalone.'''
     marbles = []
@@ -238,7 +240,10 @@ class Game(object):
             group = Group(self.marbles.get_pos(positions_or_group))
 
         self.logic.marbles = self.marbles
+        moved_group=self.is_valid_move(group,direction)
+        group.update(moved_group)
 
+    def is_valid_move(self,group,direction):
         assert group.is_valid() and self.logic.is_in_matrix(group), _('The group of marbles isn\'t valid.')
         assert group.owner == self.current, _('The marbles aren\'t yours.')
 
@@ -246,8 +251,9 @@ class Game(object):
 
         if not obstacles:
             moved_group = self.logic.get_moved(group, direction)
+            return moved_group
 
-        else: 
+        else:
             assert not self.logic.is_lateral_move(group, direction), _('You can\'t push an enemy in a lateral move.')
             assert obstacles.is_valid()
             assert obstacles.owner is not self.current, _('You can\'t push your own marbles.')
@@ -262,6 +268,15 @@ class Game(object):
             enemy.update(moved_enemy)
 
             moved_group = self.logic.get_moved(group, direction)
+            assert len(group) == len(moved_group) and moved_group.is_valid() and self.logic.is_in_matrix(
+                moved_group), _('You can\'t move there.')
+            return moved_group
+    def get_all_moves(self,group):
+        "returns all of the possible moves of the group"
+        action_list=[]
+        for i in range(0, 6):
+            try:
+                action_list+=self.is_valid_move(group,i)
+            except None:
+                print("in exception")
 
-        assert len(group) == len(moved_group) and moved_group.is_valid() and self.logic.is_in_matrix(moved_group), _('You can\'t move there.')
-        group.update(moved_group)
