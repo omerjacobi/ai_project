@@ -22,6 +22,9 @@ class Agent(object):
     def get_action(self, game_state):
         return
 
+    def evaluation_function(self, game_state):
+        return 1
+
 
 class RandomOpponentAgent(Agent):
     """
