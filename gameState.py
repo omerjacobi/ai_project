@@ -2,6 +2,8 @@ import itertools
 import numpy as np
 import abalone
 from abalone import Group
+from gameManager import Action
+
 class GameState(object):
     def __init__(self,curPlayer,game,board=None,score=0,done=False):
         super(GameState, self).__init__()
@@ -10,6 +12,7 @@ class GameState(object):
         self._board=board
         self._game=game
         self._currentPlayer=curPlayer
+        self.is_terminal = False
 
 
     @property
@@ -29,9 +32,9 @@ class GameState(object):
 
 
     def get_legal_actions(self, agent_index):#todo to make sure we need the seperation between 2 players.
-        if agent_index == 0:
+        if agent_index == 1:
             return self.get_agent_legal_actions()
-        elif agent_index == 1:
+        elif agent_index == -1:
             return self.get_agent_legal_actions()
         else:
             raise Exception("illegal agent index.")
@@ -52,16 +55,10 @@ class GameState(object):
         return np.where(self._board == 0)
 
 
-    def apply_opponent_action(self, action):
-        if self._board[action.row, action.column] != 0:
-            raise Exception("illegal opponent action (%s,%s) isn't empty." % (action.row, action.column))
-        if action.value <= 0:
-            raise Exception("The action value must be positive integer.")
-        self._board[action.row, action.column] = action.value
-        if not self.get_agent_legal_actions():
-            self._done = True
-
-    def apply_action(self, action):""
+    def apply_action(self, action):
+        self.game.move(action.group,action.direction)
+        looser = self.game.get_looser()
+        self.is_terminal = True if looser else False
 
 
     def generate_successor(self, agent_index=1, action=Action.STOP):
@@ -74,4 +71,7 @@ class GameState(object):
         else:
             raise Exception("illegal agent index.")
         return successor
+
+    def is_final_state(self):
+        return self.is_terminal
 #
