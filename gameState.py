@@ -1,4 +1,5 @@
 import itertools
+import numpy as np
 import abalone
 from abalone import Group
 class GameState(object):
@@ -27,11 +28,11 @@ class GameState(object):
         return self._game
 
 
-    def get_legal_actions(self, agent_index):
+    def get_legal_actions(self, agent_index):#todo to make sure we need the seperation between 2 players.
         if agent_index == 0:
             return self.get_agent_legal_actions()
         elif agent_index == 1:
-            return self.get_opponent_legal_actions()
+            return self.get_agent_legal_actions()
         else:
             raise Exception("illegal agent index.")
 
@@ -45,7 +46,11 @@ class GameState(object):
                 if(group.is_valid()):
                     legal_actions+=self._game.get_all_moves(group)
         return legal_actions
-#
+
+    #todo to erase if not useful
+    def get_empty_spots(self):
+        return np.where(self._board == 0)
+
 
     def apply_opponent_action(self, action):
         if self._board[action.row, action.column] != 0:

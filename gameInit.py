@@ -1,7 +1,6 @@
 import argparse
 import numpy
 # import os
-import util
 # from game import Game, RandomOpponentAgent
 # from game_state import GameState
 # from graphics_display import GabrieleCirulli2048GraphicsDisplay
@@ -11,9 +10,9 @@ import util
 #
 #
 
-import abalone.config as config
+import config
 
-import abalone.tk as abaloneTk
+import tk as abaloneTk
 tk=abaloneTk.Game()
 tk.start(config.Players.Black.positions,config.Players.White.positions)
 tk.mainloop()
