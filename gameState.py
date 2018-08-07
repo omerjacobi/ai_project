@@ -24,7 +24,9 @@ class GameState(object):
         return self._board
     @property
     def game(self):
-        return self.
+        print("hhhh")
+        return self._game
+
 
     def get_legal_actions(self, agent_index):
         if agent_index == 0:
