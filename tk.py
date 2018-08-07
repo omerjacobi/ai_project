@@ -239,7 +239,7 @@ class Game(abalone.Game, Tk):
         self.next()
         looser = self.get_looser()
         if looser:
-            print looser
+            print(looser)
             self.stop()
         self.board.draw_marbles()
 
