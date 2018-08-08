@@ -149,9 +149,8 @@ class Logic(Matrix):
             enemy = self.get_mirror_obstacles(group, direction)
             assert self.is_pushable(group, enemy), _('You can\'t push the enemy.')
             moved_group = self.get_moved(group, direction)
-        assert len(group) == len(moved_group) and moved_group.is_valid() and self.logic.is_in_matrix(
+        assert len(group) == len(moved_group) and moved_group.is_valid() and self.is_in_matrix(
                 moved_group), _('You can\'t move there.')
-        group.update(moved_group)
         return True
 
     def is_in_matrix(self, group):

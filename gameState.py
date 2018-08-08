@@ -15,7 +15,7 @@ class GameState(object):
         "returns all of the legal moves of the current player.todo implement get_all_moves in group class"
         legal_actions = []
         player_marbles = self._marbles.get_owner(agent_index)
-        for i in range(0,4):
+        for i in range(1,4):
             for subset in itertools.combinations(player_marbles, i):
                 group=Group(subset)
                 if group.is_valid():

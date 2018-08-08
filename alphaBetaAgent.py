@@ -23,7 +23,8 @@ class Agent():
         legal_moves = game_state.get_legal_actions(agent_index)
         if len(legal_moves) == 0:
             return Action.STOP
-        scores = [self.alpha_beta_search(-agent_index, game_state.generate_successor(0, action), self.depth, -np.inf, np.inf) for action in legal_moves]
+        scores = [self.alpha_beta_search(-agent_index, game_state.generate_successor(agent_index, action),
+                                         self.depth, -np.inf, np.inf) for action in legal_moves]
         best_score = max(scores)
         best_indices = [index for index in range(len(scores)) if scores[index] == best_score]
         return legal_moves[np.random.choice(best_indices)]
