@@ -2,8 +2,7 @@ import  abalone
 import config
 import tk as abaloneTk
 import alphaBetaAgent
-
-
+from gameState import GameState
 class Agent(object):
     def __init__(self,type):
         agent = None
@@ -27,4 +26,20 @@ class Game(object):
 
     def run(self):
         self.board.start(config.Players.Black.positions, config.Players.White.positions)
+        player_index  = 1
+        while True:
+            marbles = self.board.get_marbles()
+            state = GameState(marbles)
+            if player_index == 1:
+                (group, direction) = self.agent1.get_action(state,player_index)
+            else:
+                (group, direction) = self.agent2.get_action(state,player_index)
+            self.board.move(group,direction)
+            if self.broad.get_looser():
+                break
+            player_index *= -1
+
+
+
+
 
