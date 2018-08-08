@@ -13,7 +13,7 @@ def position_in_range(position):
     """
     if position[0] > 9 or position[0] < 1 or position[1] > 9 or position[1] < 1:
         return False
-    return abs(position[0] - position[1]) > 4
+    return abs(position[0] - position[1]) <= 4
 
 
 def win_or_lose(state, agent_index):
