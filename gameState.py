@@ -66,7 +66,7 @@ class GameState(object):
         self.is_terminal = True if looser else False
 
 
-    def generate_successor(self, agent_index=1, action=5):
+    def generate_successor(self, agent_index=1, action=Action.STOP):
         agent_index=agent_index*(-1)
         successor = GameState(agent_index,self._game)#todo more inputs.
         if agent_index == 1:
@@ -79,6 +79,15 @@ class GameState(object):
 
     def is_final_state(self):
         return self.is_terminal
+
+    def get_marbles_amount(self, agent_index):
+        return len(self.game.marbles.get_owner(agent_index))
+
+    def win_or_lose(self, agent_index):
+        """ Returns 1 if agent[agent_index] wins, -1 if loses and 0 if no winner yet """
+        loser = self.game.get_looser()
+        loser = loser if loser else 0
+        return loser * agent_index * (-1)
 #
 
 import tk as abaloneTk
