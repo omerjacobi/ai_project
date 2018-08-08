@@ -250,6 +250,9 @@ class Game_Board(object):
     def get_marbles(self):
         return self.marbles
 
+    def get_initial(self):
+        return self.initial
+
     def get_looser(self):
         '''get_looser() -> get the looser team, False if no one.'''
         for team, initial in zip((BLACK, WHITE), self.initial):

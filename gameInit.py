@@ -50,8 +50,8 @@ def main():
     displays = ['GUI', 'SummaryDisplay']
     agents = ['KeyboardAgent', 'MonteCarlo', 'AlphaBetaAgent']
     parser.add_argument('--display', choices=displays, help='The game ui.', default=displays[0], type=str)
-    parser.add_argument('--agent1', choices=agents, help='The agent.', default=agents[0], type=str)
-    parser.add_argument('--agent2', choices=agents, help='The agent.', default=agents[0], type=str)
+    parser.add_argument('--agent1', choices=agents, help='The agent.', default=agents[2], type=str)
+    parser.add_argument('--agent2', choices=agents, help='The agent.', default=agents[2], type=str)
     parser.add_argument('--depth', help='The maximum depth for to search in the game tree.', default=2, type=int)
     parser.add_argument('--num_of_games', help='The number of games to run.', default=1, type=int)
     parser.add_argument('--initial_board', help='Initial board for new games.', default=None, type=str)

@@ -23,32 +23,37 @@ class Agent():
         legal_moves = game_state.get_legal_actions(agent_index)
         if len(legal_moves) == 0:
             return Action.STOP
-        scores = [self.alpha_beta_search(-agent_index, game_state.generate_successor(agent_index, action),
-                                         self.depth, -np.inf, np.inf) for action in legal_moves]
+        scores = [self.alpha_beta_search(agent_index, game_state.generate_successor(agent_index, action), self.depth,
+                                         -np.inf, np.inf, agent_index) for action in legal_moves]
         best_score = max(scores)
         best_indices = [index for index in range(len(scores)) if scores[index] == best_score]
         return legal_moves[np.random.choice(best_indices)]
 
 
-    def alpha_beta_search(self, agent_index, game_state, depth, alpha, beta):
+    def alpha_beta_search(self, curr_agent_index, game_state, depth, alpha, beta, max_player_index):
         """
         Returns the minimax value of a state using alpha-beta search
+        :param max_player_index:
         """
-        legal_moves = game_state.get_legal_actions(agent_index)
+        legal_moves = game_state.get_legal_actions(curr_agent_index)
         if len(legal_moves) == 0 or depth == 0:
-            return self.evaluation_function(game_state, agent_index)
-        if agent_index == 0:
+            return self.evaluation_function(game_state, curr_agent_index)
+        if curr_agent_index == max_player_index:
             current = -np.inf
             for action in legal_moves:
-                current = max(current, self.alpha_beta_search(-agent_index, game_state.generate_successor(agent_index, action), depth, alpha, beta))
+                current = max(current, self.alpha_beta_search(-curr_agent_index,
+                                                              game_state.generate_successor(curr_agent_index, action),
+                                                              depth, alpha, beta, max_player_index))
                 alpha = max(alpha, current)
                 if beta <= alpha:
                     break
             return current
-        elif agent_index == 1:
+        elif curr_agent_index == -max_player_index:
             current = np.inf
             for action in legal_moves:
-                current = min(current, self.alpha_beta_search(-agent_index, game_state.generate_successor(agent_index, action), depth - 1, alpha, beta))
+                current = min(current, self.alpha_beta_search(-curr_agent_index,
+                                                              game_state.generate_successor(curr_agent_index, action),
+                                                              depth - 1, alpha, beta, max_player_index))
                 beta = min(beta, current)
                 if beta <= alpha:
                     break

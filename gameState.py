@@ -5,11 +5,22 @@ import config
 import tk as abaloneTk
 from copy import deepcopy
 
+BLACK = 1
+WHITE = -1
 
 class GameState(object):
-    def __init__(self, marbles):
+    def __init__(self, marbles, initial_length):
         self._marbles = deepcopy(marbles)
         self._logic = Logic()
+        self.initial = initial_length
+
+    def get_looser(self):
+        '''get_looser() -> get the looser team, False if no one.'''
+        for team, initial in zip((BLACK, WHITE), self.initial):
+            if initial - len(self._marbles.get_owner(team)) >= initial / (14/6.0):
+                return team
+        return False
+
 
     def get_legal_actions(self, agent_index):
         "returns all of the legal moves of the current player.todo implement get_all_moves in group class"
@@ -63,13 +74,13 @@ class GameState(object):
                 enemy.pop(-1)
             enemy.update(moved_enemy)
             group.update(moved_group)
-        looser = self.game.get_looser()
+        looser = self.get_looser()
         self.is_terminal = True if looser else False
 
 
 
     def generate_successor(self, agent_index = 1, action = 5):
-        successor = GameState(self._marbles)
+        successor = GameState(self._marbles, self.initial)
         successor.apply_action(action, agent_index)
         return successor
 

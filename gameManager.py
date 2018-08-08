@@ -28,10 +28,11 @@ class Game(object):
 
     def run(self):
         self.board.start(config.Players.Black.positions, config.Players.White.positions)
+        self.initial = self.board.get_initial()
         player_index  = 1
         while True:
             marbles = self.board.get_marbles()
-            state = GameState(marbles)
+            state = GameState(marbles,self.initial)
             if player_index == 1:
                 (group, direction) = self.player1.agent.get_action(state, player_index)
             else:

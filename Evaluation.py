@@ -38,7 +38,7 @@ def dist_from_center(state, agent_index):
     """
     res = 0
     for marble in state._marbles.get_owner(agent_index):
-        res += distances_from_center[marble.position]
+        res += distances_from_center[marble['position']]
     return res
 
 
