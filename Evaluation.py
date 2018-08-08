@@ -27,8 +27,8 @@ def lost_marbles(state, agent_index):
     """
     Returns the difference between agent[agent_index]'s marbles, to it's opponents marbles
     """
-    black_marbles = len(state.game.marbles.get_owner(BLACK)) * agent_index * BLACK
-    white_marbles = len(state.game.marbles.get_owner(WHITE)) * agent_index * WHITE
+    black_marbles = len(state._marbles.get_owner(BLACK)) * agent_index * BLACK
+    white_marbles = len(state._marbles.get_owner(WHITE)) * agent_index * WHITE
     return black_marbles + white_marbles
 
 
@@ -37,7 +37,7 @@ def dist_from_center(state, agent_index):
     Returns distance from board center
     """
     res = 0
-    for marble in state.game.marbles.get_owner(agent_index):
+    for marble in state._marbles.get_owner(agent_index):
         res += distances_from_center[marble.position]
     return res
 
@@ -60,7 +60,7 @@ def own_marbles_grouping(state, agent_index):
     Returns the number of neighboring marbles, for each marble that belongs to agent[agent_index]
     """
     res = 0
-    agent_marbles = state.game.marbles.get_owner(agent_index)
+    agent_marbles = state._marbles.get_owner(agent_index)
     agent_marbles_positions = map(lambda m: m.position, agent_marbles)
     for marble in agent_marbles:
         for pos in potential_neighbors(marble.position):
