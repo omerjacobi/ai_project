@@ -11,9 +11,7 @@ def position_in_range(position):
     """
     Returns True iff position is in board, else false
     """
-    if position[0] > 9 or position[0] < 1 or position[1] > 9 or position[1] < 1:
-        return False
-    return abs(position[0] - position[1]) <= 4
+    return abs(position[0] - position[1]) < 5 and position[0] < 10 and position[0] > 0 and position[1] < 10 and position[1] > 0
 
 
 def win_or_lose(state, agent_index):
@@ -21,22 +19,22 @@ def win_or_lose(state, agent_index):
     Returns 1 if agent[agent_index] wins, -1 if loses and 0 if no winner yet
     """
     loser = state.get_looser()
-    loser = loser if loser else 0
-    return loser * agent_index * (-1)
+    winner = -loser if loser else 0
+    return winner * agent_index
 
 
 def lost_marbles(state, agent_index):
     """
-    Returns the difference between agent[agent_index]'s lost marbles, to it's opponents lost marbles
+    Returns the difference between agent[agent_index]'s marbles, to it's opponents marbles
     """
-    black_marbles = len(state.game.marbles.get_owner(agent_index)) * agent_index * BLACK
-    white_marbles = len(state.game.marbles.get_owner(agent_index)) * agent_index * WHITE
+    black_marbles = len(state.game.marbles.get_owner(BLACK)) * agent_index * BLACK
+    white_marbles = len(state.game.marbles.get_owner(WHITE)) * agent_index * WHITE
     return black_marbles + white_marbles
 
 
 def dist_from_center(state, agent_index):
     """
-    Returns distance from board center, which is in position (5,5)
+    Returns distance from board center
     """
     res = 0
     for marble in state.game.marbles.get_owner(agent_index):
@@ -63,9 +61,10 @@ def own_marbles_grouping(state, agent_index):
     """
     res = 0
     agent_marbles = state.game.marbles.get_owner(agent_index)
+    agent_marbles_positions = map(lambda m: m.position, agent_marbles)
     for marble in agent_marbles:
         for pos in potential_neighbors(marble.position):
-            if pos in agent_marbles:
+            if pos in agent_marbles_positions:
                 res += 1
     return res
 

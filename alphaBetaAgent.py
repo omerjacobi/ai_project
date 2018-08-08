@@ -1,34 +1,32 @@
 import numpy as np
+import Evaluation as eval
 
 class Agent():
     """
     Minimax agent with alpha-beta pruning
-    TODO: fill this from top (this is an old implementation [not even final version] of 2048 exercise)
     """
-    def __init__(self):
-        agent = 1
-
-    def get_action(self, game_state):
+    DEPTH = 2
+    
+    def evaluationFunction(self, game_state, agent_index):
+        return (100 * eval.win_or_lose(game_state, agent_index)) + eval.lost_marbles(game_state, agent_index) + \
+               eval.dist_from_center(game_state, agent_index) + eval.own_marbles_grouping(state, agent_index) - \
+               eval.opposing_marbles_grouping(state, agent_index)
+    
+    def get_action(self, game_state, agent_index):
         """
-        Returns the minimax action using self.depth and self.evaluationFunction
+        Returns the minimax action using self.evaluationFunction
         """
-        legal_moves = game_state.get_agent_legal_actions()
+        legal_moves = game_state.get_legal_actions(agent_index)
         if len(legal_moves) == 0:
             return Action.STOP
-        scores = [self.alpha_beta_search(1, game_state.generate_successor(0, action), self.depth - 1, AlphaBetaContainer()) for action in legal_moves]
+        scores = [self.alpha_beta_search(-agent_index, game_state.generate_successor(0, action), DEPTH, -np.inf, np.inf) for action in legal_moves]
         best_score = max(scores)
         best_indices = [index for index in range(len(scores)) if scores[index] == best_score]
         return legal_moves[np.random.choice(best_indices)]
 
-    def alpha_beta_search(self, agent_index, game_state, depth, alpha_beta):
+    def alpha_beta_search(self, agent_index, game_state, depth, alpha, beta):
         """
         Returns the minimax value of a state using alpha-beta search
-        :param agent_index: 0 if Max agent, 1 if Min agent
-        :param game_state: Current game state
-        :param depth: Available depth in the state sub-tree
-        :param alpha: alpha value
-        :param beta: beta value
-        :return: The MiniMax score for the given gameState
         """
         legal_moves = game_state.get_legal_actions(agent_index)
         if len(legal_moves) == 0 or depth == 0:
@@ -36,17 +34,17 @@ class Agent():
         if agent_index == 0:
             current = -np.inf
             for action in legal_moves:
-                current = max(current, self.alpha_beta_search(1 - agent_index, game_state.generate_successor(agent_index, action), depth - 1, alpha_beta))
-                alpha_beta.set_alpha(max(alpha_beta.alpha, current))
-                if alpha_beta.cutoff_required():
+                current = max(current, self.alpha_beta_search(-agent_index, game_state.generate_successor(agent_index, action), depth, alpha, beta))
+                alpha = max(alpha, current)
+                if beta <= alpha:
                     break
             return current
         elif agent_index == 1:
             current = np.inf
             for action in legal_moves:
-                current = min(current, self.alpha_beta_search(1 - agent_index, game_state.generate_successor(agent_index, action), depth - 1, alpha_beta))
-                alpha_beta.set_beta(min(alpha_beta.beta, current))
-                if alpha_beta.cutoff_required():
+                current = min(current, self.alpha_beta_search(-agent_index, game_state.generate_successor(agent_index, action), depth - 1, alpha, beta))
+                beta = min(beta, current)
+                if beta <= alpha:
                     break
             return current
         else:
