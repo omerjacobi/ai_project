@@ -20,6 +20,7 @@ from operator import add, sub
 from gettext import gettext as _
 from library import NoNegIndexList, Reductors
 
+
 #representation of teams.
 #NOTE: they can't be 0.
 BLACK = 1
@@ -246,6 +247,9 @@ class Game_Board(object):
                 )
         self.current = BLACK
         self.initial = len(black), len(white)
+
+    def get_marbles(self):
+        return self.marbles
 
     def get_looser(self):
         '''get_looser() -> get the looser team, False if no one.'''

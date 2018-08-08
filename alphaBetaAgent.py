@@ -7,14 +7,14 @@ class Agent():
     """
     DEPTH = 2
     
-    def evaluationFunction(self, game_state, agent_index):
+    def evaluation_function(self, game_state, agent_index):
         return (100 * eval.win_or_lose(game_state, agent_index)) + eval.lost_marbles(game_state, agent_index) + \
                eval.dist_from_center(game_state, agent_index) + eval.own_marbles_grouping(state, agent_index) - \
                eval.opposing_marbles_grouping(state, agent_index)
     
     def get_action(self, game_state, agent_index):
         """
-        Returns the minimax action using self.evaluationFunction
+        Returns the minimax action using self.evaluation_function
         """
         legal_moves = game_state.get_legal_actions(agent_index)
         if len(legal_moves) == 0:
@@ -30,7 +30,7 @@ class Agent():
         """
         legal_moves = game_state.get_legal_actions(agent_index)
         if len(legal_moves) == 0 or depth == 0:
-            return self.evaluation_function(game_state)
+            return self.evaluation_function(game_state, agent_index)
         if agent_index == 0:
             current = -np.inf
             for action in legal_moves:
