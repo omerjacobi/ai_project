@@ -163,7 +163,7 @@ class Movement(Frame):
         Button(self, command=lambda: self.master.move(3), bitmap='@' + join(PATH, 'images/3.xbm')).grid(row=2, column=0)
         Button(self, command=lambda: self.master.move(4), bitmap='@' + join(PATH, 'images/4.xbm')).grid(row=1, column=0)
         Button(self, command=lambda: self.master.move(5), bitmap='@' + join(PATH, 'images/5.xbm')).grid(row=0, column=0)
-
+        
 class ViewPoint(Frame):
     '''ViewPoint(*args, **kwargs) -> Frame with buttons for updating
     the viewpoint of the board for the current player.
