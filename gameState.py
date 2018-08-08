@@ -80,6 +80,4 @@ class GameState(object):
 #
 # tk=abaloneTk.Game_Board()
 # tk.start(config.Players.Black.positions,config.Players.White.positions)
-# g=GameState(tk.marbles)
-# act_list=g.get_legal_actions(1)
 # tk.mainloop()

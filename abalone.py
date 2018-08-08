@@ -128,12 +128,17 @@ class Logic(Matrix):
     marbles = []
     def is_legal_move_logic(self,group, direction, current):
         assert group.is_valid() and self.is_in_matrix(group), _('The group of marbles isn\'t valid.')
+        #make sure the moved group isn't thrown outside the grid:
+        moved_group = self.get_moved(group, direction)
+        assert len(group) == len(moved_group) and moved_group.is_valid() and self.is_in_matrix(
+            moved_group)
+        assert self.is_in_matrix()
         assert group.owner == current, _('The marbles aren\'t yours.')
 
         obstacles = self.get_obstacles(group, direction)
 
         if not obstacles:
-            return True
+            moved_group = self.get_moved(group, direction)
 
         else:
             assert not self.is_lateral_move(group, direction), _('You can\'t push an enemy in a lateral move.')
@@ -143,9 +148,10 @@ class Logic(Matrix):
             enemy = self.get_mirror_obstacles(group, direction)
             assert self.is_pushable(group, enemy), _('You can\'t push the enemy.')
             moved_group = self.get_moved(group, direction)
-            assert len(group) == len(moved_group) and moved_group.is_valid() and self.is_in_matrix(
+        assert len(group) == len(moved_group) and moved_group.is_valid() and self.logic.is_in_matrix(
                 moved_group), _('You can\'t move there.')
-            return True
+        group.update(moved_group)
+        return True
 
     def is_in_matrix(self, group):
         '''is_in_matrix(group) -> return True if group is in Matrix,
@@ -287,26 +293,6 @@ class Game_Board(object):
 
         self.logic.marbles = self.marbles
         return self.logic.is_legal_move_logic(group, direction, self.current)
-        #
-        # assert group.is_valid() and self.logic.is_in_matrix(group), _('The group of marbles isn\'t valid.')
-        # assert group.owner == self.current, _('The marbles aren\'t yours.')
-        #
-        # obstacles = self.logic.get_obstacles(group, direction)
-        #
-        # if not obstacles:
-        #     return True
-        #
-        # else:
-        #     assert not self.logic.is_lateral_move(group, direction), _('You can\'t push an enemy in a lateral move.')
-        #     assert obstacles.is_valid()
-        #     assert obstacles.owner is not self.current, _('You can\'t push your own marbles.')
-        #
-        #     enemy = self.logic.get_mirror_obstacles(group, direction)
-        #     assert self.logic.is_pushable(group, enemy), _('You can\'t push the enemy.')
-        #     moved_group = self.logic.get_moved(group, direction)
-        #     assert len(group) == len(moved_group) and moved_group.is_valid() and self.logic.is_in_matrix(
-        #         moved_group), _('You can\'t move there.')
-        #     return True
 
     def get_all_moves(self,group):
         '''
