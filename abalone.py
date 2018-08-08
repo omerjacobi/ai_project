@@ -133,7 +133,7 @@ class Logic(Matrix):
         moved_group = self.get_moved(group, direction)
         assert len(group) == len(moved_group) and moved_group.is_valid() and self.is_in_matrix(
             moved_group)
-        assert self.is_in_matrix()
+
         assert group.owner == current, _('The marbles aren\'t yours.')
 
         obstacles = self.get_obstacles(group, direction)
