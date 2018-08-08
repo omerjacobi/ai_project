@@ -18,7 +18,6 @@
 
 from operator import add, sub
 from gettext import gettext as _
-import Action
 from library import NoNegIndexList, Reductors
 
 #representation of teams.
@@ -26,6 +25,12 @@ from library import NoNegIndexList, Reductors
 BLACK = 1
 WHITE = -1
 BOTH=2
+
+class Action(list):
+    STOP=5
+    def __init__(self,group,direction):
+        self.append((group,direction))
+
 
 class Matrix(list):
     '''Matrix() -> list with all the positions of an abalone's board.'''
@@ -285,6 +290,8 @@ class Game(object):
         for i in range(0, 6):
             try:
                 if self.is_valid_move(group,i):
-                    action_list += Action(group, i)
+                    act=Action(group, i)
+                    action_list.append(act)
             except:
                 raise("Exception in get_all_moves")
+        return action_list

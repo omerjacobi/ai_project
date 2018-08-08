@@ -1,9 +1,8 @@
 import itertools
 import numpy as np
 from abalone import Group
-import Action
 import config
-
+import tk as abaloneTk
 
 
 class GameState(object):
@@ -66,7 +65,7 @@ class GameState(object):
         self.is_terminal = True if looser else False
 
 
-    def generate_successor(self, agent_index=1, action=Action.STOP):
+    def generate_successor(self,agent_index=1,action=5):
         agent_index=agent_index*(-1)
         successor = GameState(agent_index,self._game)#todo more inputs.
         if agent_index == 1:
@@ -90,7 +89,7 @@ class GameState(object):
         return loser * agent_index * (-1)
 #
 
-import tk as abaloneTk
+
 tk=abaloneTk.Game()
 tk.start(config.Players.Black.positions,config.Players.White.positions)
 g=GameState(1,tk)
