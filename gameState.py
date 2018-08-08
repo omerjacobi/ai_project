@@ -90,8 +90,6 @@ class GameState(object):
 #
 
 
-tk=abaloneTk.Game()
+tk=abaloneTk.Game_Board()
 tk.start(config.Players.Black.positions,config.Players.White.positions)
-g=GameState(1,tk)
-act_list=g.get_agent_legal_actions()
 tk.mainloop()

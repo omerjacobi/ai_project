@@ -204,7 +204,7 @@ class Logic(Matrix):
                 len(group) > len(mirror_obstacles),
                 ))
 
-class Game(object):
+class Game_Board(object):
     '''Game() -> An abalone game.'''
 
     logic = Logic()
@@ -247,7 +247,6 @@ class Game(object):
             group = positions_or_group
         else:
             group = Group(self.marbles.get_pos(positions_or_group))
-        #11
         self.logic.marbles = self.marbles
      #  moved_group=self.is_valid_move(positions_or_group,direction)
         is_valid=self.is_valid_move(positions_or_group,direction)

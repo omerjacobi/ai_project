@@ -185,10 +185,10 @@ class ViewPoint(Frame):
                 text='right',
                 ).grid(row=0, column=1)
 
-class Game(abalone.Game, Tk):
+class Game_Board(abalone.Game_Board, Tk):
     '''Game() -> new Tkinter interface for abalone.'''
     def __init__(self):
-        super(Game, self).__init__()
+        super(Game_Board, self).__init__()
 
         Tk.__init__(self)
         self.title = 'Abalone'
@@ -210,7 +210,7 @@ class Game(abalone.Game, Tk):
 
         black -> positions for the black marbles.
         white -> positions for the white marbles.'''
-        super(Game, self).start(*args, **kwargs)
+        super(Game_Board, self).start(*args, **kwargs)
         self.current = Players[self.current]
 
         self.board = Board(master=self, width=self.winfo_reqwidth(), height=self.winfo_reqheight())
@@ -234,7 +234,7 @@ class Game(abalone.Game, Tk):
         
         direction -> direction of movement in range(6).'''
         direction = (direction + self.current.vp) % 6
-        super(Game, self).move(self.board.selected, direction)
+        super(Game_Board, self).move(self.board.selected, direction)
 
         self.next()
         looser = self.get_looser()

@@ -1,11 +1,12 @@
-from gameManager import Agent, Action
 import numpy as np
 
-class AlphaBetaAgent(Agent):
+class Agent():
     """
     Minimax agent with alpha-beta pruning
     TODO: fill this from top (this is an old implementation [not even final version] of 2048 exercise)
     """
+    def __init__(self):
+        agent = 1
 
     def get_action(self, game_state):
         """

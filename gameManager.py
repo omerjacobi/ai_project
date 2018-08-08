@@ -1,65 +1,30 @@
-import abc
-from collections import namedtuple
-from enum import Enum
-
-import numpy as np
-import time
+import  abalone
 import config
 import tk as abaloneTk
-
+import alphaBetaAgent
 
 
 class Agent(object):
-    def __init__(self):
-        super(Agent, self).__init__()
+    def __init__(self,type):
+        agent = None
+        if type == 'AlphaBetaAgent':
+            agent = alphaBetaAgent.Agent()
 
-    @abc.abstractmethod
-    def get_action(self, game_state):
-        return
-
-    def evaluation_function(self, game_state):
-        return 1
-
-
-class RandomOpponentAgent(Agent):
-    """
-    TODO: fill this (get all valid actions and choose a random one)
-    """
 
 class Game(object):
-    def __init__(self, agent, opponent_agent, display, sleep_between_actions=False):
-        super(Game, self).__init__() # TODO: is it ok to call super game ? maybe change the name of class to gamemanager???
-        self.sleep_between_actions = sleep_between_actions
-        self.agent = agent
-        self.display = display
-        self.opponent_agent = opponent_agent
+    def __init__(self, agent1_type, agent2_type, board_type):
+        super(Game, self).__init__()
+        self.agent1 = Agent(agent1_type)
+        self.agent2 = Agent(agent2_type)
+        self.board = self.board(board_type)
         self._state = None
 
-    def run_batch(self, rounds, initial_state):
-        results = []
-        for i in range(0, rounds):
-            results.append(self.run(initial_state))
-        return results
+    def board(self,type):
+        if type == 'SummaryDisplay':
+            self.board = abalone.Game_Board()
+        elif type == 'GUI':
+            self.board = abaloneTk.Game_Board()
 
-    def run(self, initial_state):
-        self._state = initial_state
-        self.display.initialize(initial_state)
-        tk = abaloneTk.Game()
-        tk.start(config.Players.Black.positions, config.Players.White.positions)
-        return self._game_loop()
+    def run(self):
+        self.board.start(config.Players.Black.positions, config.Players.White.positions)
 
-    def _game_loop(self):
-        while not self._state.is_final_state():
-            if self.sleep_between_actions:
-                time.sleep(1)
-            # self.display.mainloop_iteration()
-            action = self.agent.get_action(self._state)
-            if action == Action.STOP:
-                return
-            self._state.apply_action(action,self.display)
-            if self._state.is_final_state():
-                return                                          # TODO: Think about what this should return
-            opponent_action = self.opponent_agent.get_action(self._state)
-            self._state.apply_opponent_action(opponent_action)
-            # self.display.update_state(self._state, action, opponent_action)
-        return self._state.score, self._state.max_tile          # TODO: Think about what this should return
