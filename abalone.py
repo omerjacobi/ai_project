@@ -279,14 +279,14 @@ class Game_Board(object):
             enemy.update(moved_enemy)
             group.update(moved_group)
 
-    def is_valid_move(self,positions_or_group,direction):
+    def is_valid_move(self, positions_or_group, direction):
         if isinstance(positions_or_group, Group):
             group = positions_or_group
         else:
             group = Group(self.marbles.get_pos(positions_or_group))
 
         self.logic.marbles = self.marbles
-        return self.logic.is_legal_move_logic(group,self.current,direction)
+        return self.logic.is_legal_move_logic(group, direction, self.current)
         #
         # assert group.is_valid() and self.logic.is_in_matrix(group), _('The group of marbles isn\'t valid.')
         # assert group.owner == self.current, _('The marbles aren\'t yours.')
@@ -315,8 +315,8 @@ class Game_Board(object):
         action_list=[]
         for i in range(0, 6):
             try:
-                if self.is_valid_move(group,i):
-                    act=Action(group, i)
+                if self.is_valid_move(group, i):
+                    act = Action(group, i)
                     action_list.append(act)
             except:
                 continue
