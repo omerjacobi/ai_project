@@ -276,13 +276,15 @@ class Game(object):
             assert len(group) == len(moved_group) and moved_group.is_valid() and self.logic.is_in_matrix(
                 moved_group), _('You can\'t move there.')
             return moved_group
+
     def get_all_moves(self,group):
-        "returns all of the possible moves of the group"
+        '''
+        returns all of the possible moves of the group
+        '''
         action_list=[]
         for i in range(0, 6):
             try:
-                if(self.is_valid_move(group,i)):
+                if self.is_valid_move(group,i):
                     action_list += Action(group, i)
-            except :
-                print("in exception")
-
+            except:
+                raise("Exception in get_all_moves")

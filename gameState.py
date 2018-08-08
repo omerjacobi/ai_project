@@ -33,7 +33,6 @@ class GameState(object):
     def game(self):
         return self._game
 
-
     def get_legal_actions(self, agent_index):#todo to make sure we need the seperation between 2 players.
         if agent_index == 1:
             return self.get_agent_legal_actions()

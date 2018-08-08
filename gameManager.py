@@ -6,6 +6,7 @@ import numpy as np
 import time
 import config
 import tk as abaloneTk
+import Action
 
 
 
@@ -28,7 +29,7 @@ class RandomOpponentAgent(Agent):
 
 class Game(object):
     def __init__(self, agent, opponent_agent, display, sleep_between_actions=False):
-        super(Game, self).__init__() #todo is it ok to call super game ?maybe change the name of class to gamemanager???
+        super(Game, self).__init__() # TODO: is it ok to call super game ? maybe change the name of class to gamemanager???
         self.sleep_between_actions = sleep_between_actions
         self.agent = agent
         self.display = display
