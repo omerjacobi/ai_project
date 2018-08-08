@@ -247,7 +247,7 @@ class Game(object):
             group = positions_or_group
         else:
             group = Group(self.marbles.get_pos(positions_or_group))
-
+        #11
         self.logic.marbles = self.marbles
      #  moved_group=self.is_valid_move(positions_or_group,direction)
         is_valid=self.is_valid_move(positions_or_group,direction)
