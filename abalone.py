@@ -274,28 +274,6 @@ class Game_Board(object):
             self.current = BLACK
 
     def move(self, positions_or_group, direction):
-        '''move(positions_or_group, direction) -> move the positions_or_group
-        in direction. raises AssertionError if the move isn't possible.
-
-        positions_or_group -> position of the marbles of a Group instance with
-        them.
-
-        direction -> direction of the movement, in range(6).'''
-        # if isinstance(positions_or_group, Group):
-        #     group = positions_or_group
-        # else:
-        #     group = Group(self.marbles.get_pos(positions_or_group))
-        # self.logic.set_marbles(self.marbles)
-        # is_valid=self.is_valid_move(positions_or_group,direction)
-        # if(is_valid):
-        #     moved_group = self.logic.get_moved(group, direction)
-        #     enemy = self.logic.get_mirror_obstacles(group, direction)
-        #     moved_enemy = self.logic.get_moved(enemy, direction)
-        #     if len(enemy) > len(moved_enemy):
-        #         self.marbles.remove(enemy[-1])
-        #         enemy.pop(-1)
-        #     enemy.update(moved_enemy)
-        #     group.update(moved_group)
         if isinstance(positions_or_group, Group):
             group = positions_or_group
         else:
@@ -333,16 +311,16 @@ class Game_Board(object):
                 print('hhh')
             else:
                 self.marbles.remove(marble)
+
         for marble in moved_group:
             if marble not in self.marbles:
                 self.marbles.append(marble)
             else:
                 print('problem ; marble already inside')
         # group.update(moved_group)
+        return Action(moved_group,direction)
 
 
-            group.update(moved_group)
-            return Action(moved_group,direction)
 
     def is_valid_move(self, positions_or_group, direction):
         if isinstance(positions_or_group, Group):

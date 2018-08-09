@@ -62,8 +62,9 @@ class AlphaBetaAgent():
                     return best_score
             return best_score
         a = max_agnet(game_state, agent_index,0, float("-inf"), float("inf"))
-        super(board, self).move(a[0])
-        board.move(a[0])
+        board.move(a[0], True)
+        board.update_idletasks()
+        board.update()
         return a[0]
     # def get_action(self, game_state, agent_index):
     #     """

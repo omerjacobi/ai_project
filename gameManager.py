@@ -48,6 +48,7 @@ class Game(object):
             while True:
                 marbles = self.board.get_marbles()
                 state = gameState.GameState(marbles, initial)
+                self.board.changed = False
                 if player_index == 1:
                     (group, direction) = self.player1.agent.get_action(state, player_index, self.board)
                 else:
@@ -55,7 +56,6 @@ class Game(object):
                 if self.board.get_looser():
                     break
                 player_index *= -1
-                self.board.current = player_index
     #
     # def initializeForHuman(self):
     #     self.tkState = abaloneTk.Game_Board()
