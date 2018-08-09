@@ -1,7 +1,5 @@
 import itertools
 import numpy as np
-import time
-
 from abalone import Group, Logic ,Action
 import config
 import tk as abaloneTk
@@ -79,7 +77,9 @@ class GameState(object):
         looser = self.get_looser()
         self.is_terminal = True if looser else False
 
-    def generate_successor(self, agent_index=1, action=5):
+
+
+    def generate_successor(self, agent_index = 1, action = 5):
         successor = GameState(self._marbles, self.initial)
         successor.apply_action(action, agent_index)
         return successor
@@ -89,9 +89,6 @@ class GameState(object):
 
 
 
-# tk=abaloneTk.Game_Board()
-# tk.start(config.Players.Black.positions,config.Players.White.positions)
-# while not tk.changed:
-#     tk.update_idletasks()
-#     tk.update()
-#     time.sleep(0.01)
+tk=abaloneTk.Game_Board()
+tk.start(config.Players.Black.positions,config.Players.White.positions)
+tk.mainloop()
