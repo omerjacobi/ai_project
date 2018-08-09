@@ -146,7 +146,8 @@ class Logic(Matrix):
             moved_group = self.get_moved(group, direction)
 
         else:
-            assert not self.is_lateral_move(group, direction), _('You can\'t push an enemy in a lateral move.')
+            assert not self.is_lateral_move(group, direction),_('You can\'t push an enemy in a lateral move.')
+
             assert obstacles.is_valid()
             assert obstacles.owner is not current, _('You can\'t push your own marbles.')
 
