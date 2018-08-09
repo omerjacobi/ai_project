@@ -19,6 +19,7 @@
 from operator import add, sub
 from gettext import gettext as _
 from library import NoNegIndexList, Reductors
+from copy import deepcopy
 
 
 #representation of teams.
@@ -30,7 +31,7 @@ BOTH=2
 class Action(list):
     STOP=5
     def __init__(self,group,direction):
-        self.append((group,direction))
+        self.append((deepcopy(group),direction))
 
 
 class Matrix(list):
@@ -127,6 +128,9 @@ class Group(list):
 class Logic(Matrix):
     '''Logic() -> group of methods with the game logic of abalone.'''
     marbles = []
+    def set_marbles(self, marbles):
+        self.marbles = marbles
+
     def is_legal_move_logic(self,group, direction, current):
         assert group.is_valid() and self.is_in_matrix(group), _('The group of marbles isn\'t valid.')
         #make sure the moved group isn't thrown outside the grid:
@@ -279,7 +283,7 @@ class Game_Board(object):
             group = positions_or_group
         else:
             group = Group(self.marbles.get_pos(positions_or_group))
-        self.logic.marbles = self.marbles
+        self.logic.set_marbles(self.marbles)
         is_valid=self.is_valid_move(positions_or_group,direction)
         if(is_valid):
             moved_group = self.logic.get_moved(group, direction)
@@ -297,7 +301,7 @@ class Game_Board(object):
         else:
             group = Group(self.marbles.get_pos(positions_or_group))
 
-        self.logic.marbles = self.marbles
+        self.logic.set_marbles(self.marbles)
         return self.logic.is_legal_move_logic(group, direction, self.current)
 
     def get_all_moves(self,group):

@@ -40,7 +40,7 @@ class GameState(object):
         action_list=[]
         for i in range(0, 6):
             try:
-                self._logic.marbles=self._marbles
+                self._logic.set_marbles(self._marbles)
                 if self._logic.is_legal_move_logic(group, i, agent_index):
                     act = Action(group, i)
                     action_list.append(act)
@@ -58,12 +58,12 @@ class GameState(object):
         positions_or_group = action[0][0]
         direction = action[0][1]
 
-        if isinstance(positions_or_group, Group):
-            group = positions_or_group
-        else:
-            group = Group(self._marbles.get_pos(positions_or_group))
+        # if isinstance(positions_or_group, Group):
+        #     group = positions_or_group
+        # else:
+        group = Group(self._marbles.get_pos(positions_or_group.positions))
 
-        self._logic.marbles = self._marbles
+        self._logic.set_marbles(self._marbles)
         is_valid = self._logic.is_legal_move_logic(positions_or_group, direction, agent_index)
         if is_valid:
             moved_group = self._logic.get_moved(group, direction)

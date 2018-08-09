@@ -1,6 +1,7 @@
 import numpy as np
 import Evaluation as eval
 from abalone import Action
+from copy import deepcopy
 
 
 def eval_fn(game_state, agent_index):
@@ -35,8 +36,10 @@ class Agent():
         Returns the minimax value of a state using alpha-beta search
         :param max_player_index:
         """
+        if depth == 0:
+            return self.evaluation_function(game_state, curr_agent_index)
         legal_moves = game_state.get_legal_actions(curr_agent_index)
-        if len(legal_moves) == 0 or depth == 0:
+        if len(legal_moves) == 0:
             return self.evaluation_function(game_state, curr_agent_index)
         if curr_agent_index == max_player_index:
             current = -np.inf

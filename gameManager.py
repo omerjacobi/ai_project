@@ -30,7 +30,9 @@ class Game(object):
         self.board.start(config.Players.Black.positions, config.Players.White.positions)
         self.initial = self.board.get_initial()
         player_index  = 1
+        counter = 0
         while True:
+            counter += 1
             marbles = self.board.get_marbles()
             state = GameState(marbles,self.initial)
             if player_index == 1:
