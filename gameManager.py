@@ -3,13 +3,16 @@ import config
 import tk as abaloneTk
 import alphaBetaAgent
 import gameState
+import humanAgent
 
 
 class Agent_repr(object):
     def __init__(self, type):
         self.agent = None
         if type == 'AlphaBetaAgent':
-            self.agent = alphaBetaAgent.Agent(2)
+            self.agent = alphaBetaAgent.AlphaBetaAgent(1)
+        if type == 'KeyboardAgent':
+            self.agent = humanAgent.HumanAgent()
 
 
 
@@ -40,20 +43,20 @@ class Game(object):
             state.start(config.Players.Black.positions, config.Players.White.positions)
             state.mainloop()
         else:
-            if self.humanPlayers != 0:
-                self.initializeForHuman()
+            self.board.update_idletasks()
+            self.board.changed = False
             while True:
                 marbles = self.board.get_marbles()
                 state = gameState.GameState(marbles, initial)
                 if player_index == 1:
-                    (group, direction) = self.player1.agent.get_action(state, player_index, self.tkState)
+                    (group, direction) = self.player1.agent.get_action(state, player_index, self.board)
                 else:
-                    (group, direction) = self.player2.agent.get_action(state, player_index, self.tkState)
-                self.board.move(group, direction)
+                    (group, direction) = self.player2.agent.get_action(state, player_index, self.board)
                 if self.board.get_looser():
                     break
                 player_index *= -1
                 self.board.current = player_index
-    def initializeForHuman(self):
-        self.tkState = abaloneTk.Game_Board()
-        self.tkState.start(config.Players.Black.positions, config.Players.White.positions)
+    #
+    # def initializeForHuman(self):
+    #     self.tkState = abaloneTk.Game_Board()
+    #     self.tkState.start(config.Players.Black.positions, config.Players.White.positions)

@@ -89,9 +89,9 @@ class GameState(object):
 
 
 
-tk=abaloneTk.Game_Board()
-tk.start(config.Players.Black.positions,config.Players.White.positions)
-while not tk.changed:
-    tk.update_idletasks()
-    tk.update()
-    time.sleep(0.01)
+# tk=abaloneTk.Game_Board()
+# tk.start(config.Players.Black.positions,config.Players.White.positions)
+# while not tk.changed:
+#     tk.update_idletasks()
+#     tk.update()
+#     time.sleep(0.01)

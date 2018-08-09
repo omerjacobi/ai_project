@@ -11,7 +11,7 @@ class HumanAgent():
     Minimax agent with alpha-beta pruning
     """
 
-    def __init__(self, depth, evaluation_function):
+    def __init__(self, depth=None, evaluation_function=None):
         self.depth = depth
         self.evaluation_function = evaluation_function
 
@@ -23,5 +23,5 @@ class HumanAgent():
             tk.update_idletasks()
             tk.update()
             time.sleep(0.01)
-        game_state.apply_action(tk.lastMove, agent_index)
-        return game_state
+        # game_state.apply_action(tk.lastMove, agent_index)
+        return tk.lastMove[0]

@@ -14,7 +14,7 @@ class AlphaBetaAgent():
         self.depth = depth
         self.evaluation_function = evaluation_function
 
-    def get_action(self, game_state, agent_index, tk):
+    def get_action(self, game_state, agent_index, board):
         """
         Returns the minimax action using self.evaluation_function
         """
@@ -61,7 +61,9 @@ class AlphaBetaAgent():
                 if alpha >= beta:
                     return best_score
             return best_score
-        a = max_agnet(game_state, index,0, float("-inf"), float("inf"))
+        a = max_agnet(game_state, agent_index,0, float("-inf"), float("inf"))
+        super(board, self).move(a[0])
+        board.move(a[0])
         return a[0]
     # def get_action(self, game_state, agent_index):
     #     """
