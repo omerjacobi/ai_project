@@ -7,7 +7,7 @@ class Agent_repr(object):
     def __init__(self,type):
         self.agent = None
         if type == 'AlphaBetaAgent':
-            self.agent = alphaBetaAgent.Agent(2)
+            self.agent = alphaBetaAgent.Agent(1)
 
 
 
@@ -23,7 +23,7 @@ class Game(object):
         if type == 'SummaryDisplay':
             return abalone.Game_Board()
         elif type == 'GUI':
-            return abaloneTk.Game_Board()
+            return abalone.Game_Board()
         return None
 
     def run(self):
@@ -43,6 +43,8 @@ class Game(object):
             if self.board.get_looser():
                 break
             player_index *= -1
+            self.board.current=player_index
+
 
 
 
