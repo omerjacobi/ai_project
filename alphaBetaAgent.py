@@ -1,24 +1,22 @@
 import numpy as np
 import Evaluation as eval
 from abalone import Action
-from copy import deepcopy
 
 
 def eval_fn(game_state, agent_index):
     return 5 * eval.lost_marbles(game_state, agent_index) + eval.dist_from_center(game_state, agent_index)
 
-
-class Agent():
+class AlphaBetaAgent():
     """
     Minimax agent with alpha-beta pruning
     """
-    def __init__(self, depth, evaluation_function=eval_fn):
+    def __init__(self, depth, evaluation_function=eval_fn,tk=None):
         self.depth = depth
         self.evaluation_function = evaluation_function
 
-    def get_action(self, game_state, index):
+    def get_action(self, game_state, agent_index, tk):
         """
-        Returns the minimax action using self.depth and self.evaluationFunction
+        Returns the minimax action using self.evaluation_function
         """
 
         def max_agnet(game_state, agent_index, depth, alpha, beta):
