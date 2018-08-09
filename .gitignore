@@ -156,3 +156,5 @@ crashlytics-build.properties
 fabric.properties
 /.idea/ai_project.iml
 /.idea/modules.xml
+/.idea/misc.xml
+/.idea/vcs.xml
