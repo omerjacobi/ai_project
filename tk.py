@@ -97,22 +97,22 @@ class Board(Canvas):
         for pos in self.matrix:
             t, b = circle(self.get_coord(pos), self.edge / 9)
             self.create_oval(
-                    t.x, t.y, b.x, b.y, 
-                    fill=config.Holes.fill, 
-                    outline=config.Holes.outline,
-                    tags=config.Holes.tag)
+                t.x, t.y, b.x, b.y,
+                fill=config.Holes.fill,
+                outline=config.Holes.outline,
+                tags=config.Holes.tag)
 
     def draw_marbles(self):
         '''draw_marbles() -> draw the marbles.'''
-        # self.selected = Group()
-        # self.delete(config.Marbles.tag)
-        # for marble in self.master.marbles:
-        #     t, b = circle(self.get_coord(marble['position']), self.edge / 8)
-        #     marble.box = t, b
-        #     marble.id = self.create_oval(
-        #             t.x, t.y, b.x, b.y,
-        #             fill=Players[marble['owner']].fill,
-        #             tags=config.Marbles.tag)
+        self.selected = Group()
+        self.delete(config.Marbles.tag)
+        for marble in self.master.marbles:
+            t, b = circle(self.get_coord(marble['position']), self.edge / 8)
+            marble.box = t, b
+            marble.id = self.create_oval(
+                t.x, t.y, b.x, b.y,
+                fill=Players[marble['owner']].fill,
+                tags=config.Marbles.tag)
 
     def update_selection(self, e):
         '''update_selection(event) -> update self.selected with the marble
@@ -134,16 +134,16 @@ class Board(Canvas):
                         self.selected = Group([])
                 else:
                     # assert marble['owner'] == self.master.current
-                    if(marble['owner'] != self.master.current):
+                    if (marble['owner'] != self.master.current):
                         tkMessageBox.showinfo("Hey",
                                               "It's Not Your Turn!")
                         continue
                     self.selected = Group(self.selected + [marble])
                     if self.selected.is_valid():
                         select(marble)
-                    else:  
+                    else:
                         self.selected.remove(marble)
-        
+
     def get_coord(self, pos):
         '''get_coord(position) -> get coordinates for the given position.'''
         return get_coord(self.center, self.edge, pos, self.vps[self.master.current.vp])
@@ -169,6 +169,7 @@ class ViewPoint(Frame):
     the viewpoint of the board for the current player.
 
     *args, **kwargs -> arguments for Tkinter.Frame.'''
+
     def __init__(self, *args, **kwargs):
         Frame.__init__(self, *args, **kwargs)
 
@@ -195,7 +196,9 @@ class Game_Board(abalone.Game_Board, Tk):
         self.bind('<Configure>', self.resize)
         self.minsize(400, 400)
         self.maxsize(1000, 1000)
-        
+        self.lastMove = None
+        self.changed = False
+
     def resize(self, e):
         '''resize(event) -> update the board size
         and resize it with event.x and event.y.'''
@@ -234,14 +237,15 @@ class Game_Board(abalone.Game_Board, Tk):
         
         direction -> direction of movement in range(6).'''
         direction = (direction + self.current.vp) % 6
-        super(Game_Board, self).move(self.board.selected, direction)
-
+        self.lastMove = super(Game_Board, self).move(self.board.selected, direction)
         self.next()
         looser = self.get_looser()
         if looser:
             print(looser)
             self.stop()
         self.board.draw_marbles()
+        self.changed = True
+
 
     def stop(self):
         '''stop() -> destroy the current game.'''

@@ -230,10 +230,11 @@ class Logic(Matrix):
         group -> Group instance
         mirror_obstacles -> obstacles returned by Logic.get_mirror_obstacles'''
         return all((
-                mirror_obstacles.is_valid(),
-                self.is_in_matrix(mirror_obstacles),
-                len(group) > len(mirror_obstacles),
-                ))
+            mirror_obstacles.is_valid(),
+            self.is_in_matrix(mirror_obstacles),
+            len(group) > len(mirror_obstacles),
+        ))
+
 
 class Game_Board(object):
     '''Game() -> An abalone game.'''
@@ -246,9 +247,9 @@ class Game_Board(object):
         black -> positions of the marbles of the black team.
         white -> positions of the marbles of the white team.'''
         self.marbles = MarbleManager(
-                [ Marble(position, BLACK) for position in black ] + \
-                [ Marble(position, WHITE) for position in white ]
-                )
+            [Marble(position, BLACK) for position in black] + \
+            [Marble(position, WHITE) for position in white]
+        )
         self.current = BLACK
         self.initial = len(black), len(white)
 
@@ -261,7 +262,7 @@ class Game_Board(object):
     def get_looser(self):
         '''get_looser() -> get the looser team, False if no one.'''
         for team, initial in zip((BLACK, WHITE), self.initial):
-            if initial - len(self.marbles.get_owner(team)) >= initial / (14/6.0):
+            if initial - len(self.marbles.get_owner(team)) >= initial / (14 / 6.0):
                 return team
         return False
 
@@ -340,6 +341,8 @@ class Game_Board(object):
         # group.update(moved_group)
 
 
+            group.update(moved_group)
+            return Action(moved_group,direction)
 
     def is_valid_move(self, positions_or_group, direction):
         if isinstance(positions_or_group, Group):
@@ -350,11 +353,11 @@ class Game_Board(object):
         self.logic.set_marbles(self.marbles)
         return self.logic.is_legal_move_logic(group, direction, self.current)
 
-    def get_all_moves(self,group):
+    def get_all_moves(self, group):
         '''
         returns all of the possible moves of the group
         '''
-        action_list=[]
+        action_list = []
         for i in range(0, 6):
             try:
                 if self.is_valid_move(group, i):
