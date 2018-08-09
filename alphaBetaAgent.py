@@ -29,7 +29,9 @@ class Agent():
             best_score = float("-inf")
             # Action.Stop is always acpeted
             best_action = Action.STOP
-            for action in action_list:
+            for index, action in enumerate(action_list):
+                if depth == 0:
+                    print (index)
                 successor = game_state.generate_successor(agent_index, action)
                 score = min_agent(successor, -agent_index, depth, alpha, beta)
                 if score > best_score:
@@ -61,9 +63,8 @@ class Agent():
                 if alpha >= beta:
                     return best_score
             return best_score
-
-        return max_agnet(game_state, index,0, float("-inf"), float("inf"))
-
+        a = max_agnet(game_state, index,0, float("-inf"), float("inf"))
+        return a[0]
     # def get_action(self, game_state, agent_index):
     #     """
     #     Returns the minimax action using self.evaluation_function

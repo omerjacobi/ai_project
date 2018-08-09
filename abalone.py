@@ -279,21 +279,66 @@ class Game_Board(object):
         them.
 
         direction -> direction of the movement, in range(6).'''
+        # if isinstance(positions_or_group, Group):
+        #     group = positions_or_group
+        # else:
+        #     group = Group(self.marbles.get_pos(positions_or_group))
+        # self.logic.set_marbles(self.marbles)
+        # is_valid=self.is_valid_move(positions_or_group,direction)
+        # if(is_valid):
+        #     moved_group = self.logic.get_moved(group, direction)
+        #     enemy = self.logic.get_mirror_obstacles(group, direction)
+        #     moved_enemy = self.logic.get_moved(enemy, direction)
+        #     if len(enemy) > len(moved_enemy):
+        #         self.marbles.remove(enemy[-1])
+        #         enemy.pop(-1)
+        #     enemy.update(moved_enemy)
+        #     group.update(moved_group)
         if isinstance(positions_or_group, Group):
             group = positions_or_group
         else:
             group = Group(self.marbles.get_pos(positions_or_group))
-        self.logic.set_marbles(self.marbles)
-        is_valid=self.is_valid_move(positions_or_group,direction)
-        if(is_valid):
+
+        self.logic.marbles = self.marbles
+
+        assert group.is_valid() and self.logic.is_in_matrix(group), _('The group of marbles isn\'t valid.')
+        assert group.owner == self.current, _('The marbles aren\'t yours.')
+
+        obstacles = self.logic.get_obstacles(group, direction)
+
+        if not obstacles:
             moved_group = self.logic.get_moved(group, direction)
+
+        else:
+            assert not self.logic.is_lateral_move(group, direction), _('You can\'t push an enemy in a lateral move.')
+            assert obstacles.is_valid()
+            assert obstacles.owner is not self.current, _('You can\'t push your own marbles.')
+
             enemy = self.logic.get_mirror_obstacles(group, direction)
+            assert self.logic.is_pushable(group, enemy), _('You can\'t push the enemy.')
+
             moved_enemy = self.logic.get_moved(enemy, direction)
             if len(enemy) > len(moved_enemy):
                 self.marbles.remove(enemy[-1])
                 enemy.pop(-1)
             enemy.update(moved_enemy)
-            group.update(moved_group)
+
+            moved_group = self.logic.get_moved(group, direction)
+
+        assert len(group) == len(moved_group) and moved_group.is_valid() and self.logic.is_in_matrix(moved_group), _('You can\'t move there.')
+        for marble in group:
+            if marble not in self.marbles:
+                print('hhh')
+            else:
+                self.marbles.remove(marble)
+        for marble in moved_group:
+            if marble not in self.marbles:
+                self.marbles.append(marble)
+            else:
+                print('problem ; marble already inside')
+        # group.update(moved_group)
+
+
 
     def is_valid_move(self, positions_or_group, direction):
         if isinstance(positions_or_group, Group):

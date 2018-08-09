@@ -104,15 +104,15 @@ class Board(Canvas):
 
     def draw_marbles(self):
         '''draw_marbles() -> draw the marbles.'''
-        self.selected = Group()
-        self.delete(config.Marbles.tag)
-        for marble in self.master.marbles:
-            t, b = circle(self.get_coord(marble['position']), self.edge / 8)
-            marble.box = t, b
-            marble.id = self.create_oval(
-                    t.x, t.y, b.x, b.y, 
-                    fill=Players[marble['owner']].fill, 
-                    tags=config.Marbles.tag)
+        # self.selected = Group()
+        # self.delete(config.Marbles.tag)
+        # for marble in self.master.marbles:
+        #     t, b = circle(self.get_coord(marble['position']), self.edge / 8)
+        #     marble.box = t, b
+        #     marble.id = self.create_oval(
+        #             t.x, t.y, b.x, b.y,
+        #             fill=Players[marble['owner']].fill,
+        #             tags=config.Marbles.tag)
 
     def update_selection(self, e):
         '''update_selection(event) -> update self.selected with the marble
