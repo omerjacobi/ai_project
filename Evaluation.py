@@ -87,10 +87,17 @@ def own_marbles_grouping(state, agent_index):
 
 
 def opposing_marbles_grouping(state, agent_index):
+    """
+    Returns the number of neighboring marbles, for each marble that belongs to the opponent
+    """
     return own_marbles_grouping(state, -agent_index)
 
 
 def count_row_sequence(marbles_group_positions, start_pos, direction):
+    """
+    Returns the length of a row sequence of marbles, starting from start_pos
+    The implementation depends on that the marble in start_pos is in marbles_group_positions
+    """
     res = 1
     for i in range(1, 3):
         if (start_pos[0], start_pos[1] + i * direction) in marbles_group_positions:
@@ -101,16 +108,25 @@ def count_row_sequence(marbles_group_positions, start_pos, direction):
 
 
 def has_numerical_advantage(agent_marbles_positions, agent_pos, opponent_marbles_positions, opponent_pos, direction):
+    """
+    Returns True iff a there's a row sequence advantage of up to 3 marbles to agent over it's opponent in a certain row
+    """
     return count_row_sequence(agent_marbles_positions, agent_pos, -direction) > count_row_sequence(opponent_marbles_positions, opponent_pos, direction)
 
 
 def has_free_zone_for_sumito(opponent_pos, direction, opponent_marbles_positions, agent_marbles_positions):
+    """
+    Returns True iff there is a valid space for a Sumito move ('pushing' opponent's marbles)
+    """
     sumito_pos = (opponent_pos[0],
                   opponent_pos[1] + direction * (count_row_sequence(opponent_marbles_positions, opponent_pos ,direction)))
     return (not position_in_range(sumito_pos)) or (sumito_pos not in opponent_marbles_positions and sumito_pos not in agent_marbles_positions)
 
 
 def attacking_opponent(state, agent_index):
+    """
+    Returns the number of attacking positions (Sumito positions) of the agent (rows only)
+    """
     res = 0
     agent_marbles = state._marbles.get_owner(agent_index)
     opponent_marbles = state._marbles.get_owner(-agent_index)
@@ -129,6 +145,9 @@ def attacking_opponent(state, agent_index):
 
 
 def attacked_by_opponent(state, agent_index):
+    """
+    Returns the number of attacking positions (Sumito positions) of the opponent
+    """
     return attacking_opponent(state, -agent_index)
 
 
