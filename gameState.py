@@ -15,11 +15,16 @@ class GameState(object):
         self._logic = Logic()
         self.initial = initial_length
         self.arr_state_rpr = numpy.zeros(shape=(9, 9))#todo to make sure if this process is needed or can be spare
+        self.create_state_string()
+
+    def create_state_string(self):
         for marble in self._marbles:
-            if(marble['owner']==1):
-                self.arr_state_rpr[marble['position'][0]-1][marble['position'][1]-1]=1
+            if (marble['owner'] == 1):
+                self.arr_state_rpr[marble['position'][0] - 1][marble['position'][1] - 1] = 1
             else:
-                self.arr_state_rpr[marble['position'][0]-1][marble['position'][1]-1]=2
+                self.arr_state_rpr[marble['position'][0] - 1][marble['position'][1] - 1] = 2
+        self.state_string = np.array2string(self.arr_state_rpr)
+
     def get_looser(self):
         '''get_looser() -> get the looser team, False if no one.'''
         for team, initial in zip((BLACK, WHITE), self.initial):
@@ -77,12 +82,25 @@ class GameState(object):
             moved_group = self._logic.get_moved(group, direction)
             enemy = self._logic.get_mirror_obstacles(group, direction)
             moved_enemy = self._logic.get_moved(enemy, direction)
-            if len(enemy) > len(moved_enemy):
-                self._marbles.remove(enemy[-1])
-                enemy.pop(-1)
-            enemy.update(moved_enemy)
-            group.update(moved_group)
+            # if len(enemy) > len(moved_enemy):
+            #     self._marbles.remove(enemy[-1])
+            #     enemy.pop(-1)
+            # enemy.update(moved_enemy)
+            # group.update(moved_group)
+            for marble in group + enemy:
+                if marble not in self._marbles:
+                    print('hhh')
+                else:
+                    self._marbles.remove(marble)
+
+            for marble in moved_group + moved_enemy:
+                if marble not in self._marbles:
+                    self._marbles.append(marble)
+                else:
+                    print('problem ; marble already inside')
+
         looser = self.get_looser()
+        self.create_state_string()
         self.is_terminal = True if looser else False
 
 

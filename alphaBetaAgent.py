@@ -15,6 +15,7 @@ class AlphaBetaAgent():
     def __init__(self, depth, evaluation_function=eval_fn):
         self.depth = depth
         self.evaluation_function = evaluation_function
+        self.transposition_table = dict()
 
     def get_action(self, game_state, agent_index, board):
         """
@@ -33,7 +34,10 @@ class AlphaBetaAgent():
                 if depth == 0:
                     print (index)
                 successor = game_state.generate_successor(agent_index, action)
-                score = min_agent(successor, -agent_index, depth, alpha, beta)
+                if self.transposition_table.has_key(successor.state_string + str(agent_index)):
+                    score = self.transposition_table[successor.state_string + str(agent_index)]
+                else:
+                    score = min_agent(successor, -agent_index, depth, alpha, beta)
                 if score > best_score:
                     best_score = score
                     best_action = action
@@ -55,9 +59,16 @@ class AlphaBetaAgent():
                 # finish the depth tree
                 if depth == self.depth - 1:
                     score = self.evaluation_function(successor, agent_index)
+                    curr_state_str = successor.state_string + str(agent_index)
+                    self.transposition_table[curr_state_str] = score
                 # continou to the tree
+
                 else:
-                    score = max_agnet(successor, -agent_index, depth + 1, alpha, beta)
+                    successor = game_state.generate_successor(agent_index, action)
+                    if self.transposition_table.has_key(successor.state_string + str(agent_index)):
+                        score = self.transposition_table[successor.state_string + str(agent_index)]
+                    else:
+                        score = max_agnet(successor, -agent_index, depth + 1, alpha, beta)
                 best_score = min(score, best_score)
                 beta = min(beta, best_score)
                 if alpha >= beta:
@@ -77,7 +88,6 @@ class AlphaBetaAgent():
         for marble in state._marbles:
             marble_list.append(Marble(marble['position'],marble['owner']))
         state._marbles = MarbleManager(marble_list)
-        print (state._marbles)
         return state
     # def get_action(self, game_state, agent_index):
     #     """
