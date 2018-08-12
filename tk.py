@@ -146,8 +146,9 @@ class Board(Canvas):
                         self.selected.remove(marble)
 
     def get_coord(self, pos):
+
         '''get_coord(position) -> get coordinates for the given position.'''
-        return get_coord(self.center, self.edge, pos, self.vps[self.master.current.vp])
+        return get_coord(self.center, self.edge, pos, self.vps[0])
    
 
 class Movement(Frame):
@@ -158,12 +159,12 @@ class Movement(Frame):
     def __init__(self, *args, **kwargs):
         Frame.__init__(self, *args, **kwargs)
 
-        Button(self, command=lambda: self.master.move(0, False), bitmap='@' + join(PATH, 'images/0.xbm')).grid(row=0, column=1)
-        Button(self, command=lambda: self.master.move(1, False), bitmap='@' + join(PATH, 'images/1.xbm')).grid(row=1, column=1)
-        Button(self, command=lambda: self.master.move(2, False), bitmap='@' + join(PATH, 'images/2.xbm')).grid(row=2, column=1)
-        Button(self, command=lambda: self.master.move(3, False), bitmap='@' + join(PATH, 'images/3.xbm')).grid(row=2, column=0)
-        Button(self, command=lambda: self.master.move(4, False), bitmap='@' + join(PATH, 'images/4.xbm')).grid(row=1, column=0)
-        Button(self, command=lambda: self.master.move(5, False), bitmap='@' + join(PATH, 'images/5.xbm')).grid(row=0, column=0)
+        Button(self, command=lambda: self.master.move(0, False) if self.master.current==1 else self.master.move(3, False), bitmap='@' + join(PATH, 'images/0.xbm')).grid(row=0, column=1)
+        Button(self, command=lambda: self.master.move(1, False) if self.master.current==1 else self.master.move(4, False), bitmap='@' + join(PATH, 'images/1.xbm')).grid(row=1, column=1)
+        Button(self, command=lambda: self.master.move(2, False) if self.master.current==1 else self.master.move(5, False), bitmap='@' + join(PATH, 'images/2.xbm')).grid(row=2, column=1)
+        Button(self, command=lambda: self.master.move(3, False) if self.master.current==1 else self.master.move(0, False), bitmap='@' + join(PATH, 'images/3.xbm')).grid(row=2, column=0)
+        Button(self, command=lambda: self.master.move(4, False) if self.master.current==1 else self.master.move(1, False), bitmap='@' + join(PATH, 'images/4.xbm')).grid(row=1, column=0)
+        Button(self, command=lambda: self.master.move(5, False) if self.master.current==1 else self.master.move(2, False), bitmap='@' + join(PATH, 'images/5.xbm')).grid(row=0, column=0)
         
 class ViewPoint(Frame):
     '''ViewPoint(*args, **kwargs) -> Frame with buttons for updating
@@ -205,6 +206,9 @@ class Game_Board(abalone.Game_Board, Tk):
         and resize it with event.x and event.y.'''
         try:
             self.board.configure(width=self.winfo_width(), height=self.winfo_height())
+            self.resizable(width=False, height=False)
+            self.minsize(width=999, height=999)
+            self.maxsize(width=999, height=999)
             self.board.resize()
         except AttributeError:
             pass

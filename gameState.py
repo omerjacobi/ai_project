@@ -89,6 +89,6 @@ class GameState(object):
 
 
 
-tk=abaloneTk.Game_Board()
-tk.start(config.Players.Black.positions,config.Players.White.positions)
-tk.mainloop()
+# tk=abaloneTk.Game_Board()
+# tk.start(config.Players.Black.positions,config.Players.White.positions)
+# tk.mainloop()
