@@ -31,6 +31,7 @@ class GameState(object):
                 group=Group(subset)
                 if group.is_valid():
                     legal_actions += self.get_all_moves(group, agent_index)
+        legal_actions.reverse()
         return legal_actions
 
     def get_all_moves(self, group, agent_index):
