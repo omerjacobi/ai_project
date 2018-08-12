@@ -4,7 +4,7 @@ import tk as abaloneTk
 import alphaBetaAgent
 import gameState
 import humanAgent
-
+import RandomAgent
 
 class Agent_repr(object):
     def __init__(self, type):
@@ -13,6 +13,8 @@ class Agent_repr(object):
             self.agent = alphaBetaAgent.AlphaBetaAgent(2)
         if type == 'KeyboardAgent':
             self.agent = humanAgent.HumanAgent()
+        if type == 'RandomAgent':
+            self.agent = RandomAgent.RandomAgent()
 
 
 

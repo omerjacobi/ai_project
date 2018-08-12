@@ -20,7 +20,7 @@ from operator import add, sub
 from gettext import gettext as _
 from library import NoNegIndexList, Reductors
 from copy import deepcopy
-
+import numpy
 
 #representation of teams.
 #NOTE: they can't be 0.
@@ -71,6 +71,7 @@ class Marble(dict):
         self['position'] = position
         self['owner'] = owner
 
+
 class MarbleManager(list):
     '''MarbleManager(Marbles) -> list of Marble objects with special
     methods get_pos and get_owner.'''
@@ -94,6 +95,8 @@ class MarbleManager(list):
         if(owner==BOTH):
             return [self]
         return [ marble for marble in self if marble['owner'] == owner ]
+
+
 
 
 class Group(list):

@@ -48,7 +48,7 @@ class GameRunner(object):
 def main():
     parser = argparse.ArgumentParser(description='Abalone game.')
     displays = ['GUI', 'SummaryDisplay']
-    agents = ['KeyboardAgent', 'MonteCarlo', 'AlphaBetaAgent']
+    agents = ['KeyboardAgent', 'MonteCarlo', 'AlphaBetaAgent','RandomAgent']
     parser.add_argument('--display', choices=displays, help='The game ui.', default=displays[0], type=str)
     parser.add_argument('--agent1', choices=agents, help='The agent.', default=agents[2], type=str)
     parser.add_argument('--agent2', choices=agents, help='The agent.', default=agents[2], type=str)

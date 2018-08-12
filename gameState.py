@@ -4,6 +4,7 @@ from abalone import Group, Logic ,Action, Marble, MarbleManager
 import config
 import tk as abaloneTk
 from copy import deepcopy
+import numpy
 
 BLACK = 1
 WHITE = -1
@@ -13,7 +14,12 @@ class GameState(object):
         self._marbles = marbles
         self._logic = Logic()
         self.initial = initial_length
-
+        self.arr_state_rpr = numpy.zeros(shape=(9, 9))#todo to make sure if this process is needed or can be spare
+        for marble in self._marbles:
+            if(marble['owner']==1):
+                self.arr_state_rpr[marble['position'][0]-1][marble['position'][1]-1]=1
+            else:
+                self.arr_state_rpr[marble['position'][0]-1][marble['position'][1]-1]=2
     def get_looser(self):
         '''get_looser() -> get the looser team, False if no one.'''
         for team, initial in zip((BLACK, WHITE), self.initial):

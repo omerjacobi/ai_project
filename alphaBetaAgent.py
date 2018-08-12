@@ -6,13 +6,13 @@ from abalone import MarbleManager
 
 
 def eval_fn(game_state, agent_index):
-    return 5 * eval.lost_marbles(game_state, agent_index) + eval.dist_from_center(game_state, agent_index)
+    return  eval.lost_marbles(game_state, agent_index) + eval.dist_from_center(game_state, agent_index)
 
 class AlphaBetaAgent():
     """
     Minimax agent with alpha-beta pruning
     """
-    def __init__(self, depth, evaluation_function=eval_fn,tk=None):
+    def __init__(self, depth, evaluation_function=eval_fn):
         self.depth = depth
         self.evaluation_function = evaluation_function
 
