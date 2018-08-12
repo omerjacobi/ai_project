@@ -1,6 +1,8 @@
 import numpy as np
 import Evaluation as eval
 from abalone import Action
+from abalone import Marble
+from abalone import MarbleManager
 
 
 def eval_fn(game_state, agent_index):
@@ -61,11 +63,22 @@ class AlphaBetaAgent():
                 if alpha >= beta:
                     return best_score
             return best_score
+        game_state = self.marble_list_creator(game_state)
         a = max_agnet(game_state, agent_index,0, float("-inf"), float("inf"))
         board.move(a[0], True)
         board.update_idletasks()
         board.update()
         return a[0]
+
+
+
+    def marble_list_creator(self, state):
+        marble_list = list()
+        for marble in state._marbles:
+            marble_list.append(Marble(marble['position'],marble['owner']))
+        state._marbles = MarbleManager(marble_list)
+        print (state._marbles)
+        return state
     # def get_action(self, game_state, agent_index):
     #     """
     #     Returns the minimax action using self.evaluation_function

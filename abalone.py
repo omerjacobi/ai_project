@@ -24,6 +24,18 @@ from copy import deepcopy
 
 #representation of teams.
 #NOTE: they can't be 0.
+ERRORMSG12 = _('You can\'t move there.')
+ERRORMSG11 = _('You can\'t push the enemy.')
+ERRORMSG10 = _('You can\'t push your own marbles.')
+ERRORMSG9 = _('You can\'t push an enemy in a lateral move.')
+ERRORMSG8 = _('The marbles aren\'t yours.')
+ERRORMSG7 = _('The group of marbles isn\'t valid.')
+ERRORMSG6 = _('You can\'t move there.')
+ERRORMSG5 = _('You can\'t push the enemy.')
+ERRORMSG4 = _('You can\'t push your own marbles.')
+ERRORMSG3 = _('You can\'t push an enemy in a lateral move.')
+ERRORMSG2 = _('The marbles aren\'t yours.')
+ERRORMSG1 = _('The group of marbles isn\'t valid.')
 BLACK = 1
 WHITE = -1
 BOTH=2
@@ -31,7 +43,9 @@ BOTH=2
 class Action(list):
     STOP=5
     def __init__(self,group,direction):
-        self.append((deepcopy(group),direction))
+        new_group = [Marble(marble['position'],marble['owner']) for marble in group]
+
+        self.append((Group(new_group),direction))
 
 
 class Matrix(list):
@@ -68,6 +82,10 @@ class MarbleManager(list):
         positions -> list of (row, column) tuples.'''
         return [ marble for marble in self if marble['position'] in positions ]
 
+    def __repr__(self):
+        return 'a'
+
+
     def get_owner(self, owner):
         '''get_owner(owner) -> get the Marble objects that have their
         owner key == owner.
@@ -83,8 +101,11 @@ class Group(list):
     update and is_valid.'''
 
     def __init__(self, marbles=[]):
-        assert all([ isinstance(marble, Marble) for marble in marbles ]), self.__doc__
+        # assert all([ isinstance(marble, Marble) for marble in marbles ]), self.__doc__
         self.extend(sorted(marbles, key=lambda marble: marble['position']))
+        self.owner = 0
+        if len(marbles) > 0:
+            self.owner = marbles[0]['owner']
 
     def update(self, new):
         '''update(updated_marbles) -> update the position attribute of
@@ -93,6 +114,7 @@ class Group(list):
         updated_marbles -> updated marbles to get the position attr.'''
         for old_m, new_m in zip(self, new):
             old_m['position'] = new_m['position']
+
 
     def is_valid(self):
         '''is_valid() -> return bool saying if this Group is a valid one.
@@ -104,20 +126,22 @@ class Group(list):
             return False
 
         #the owner of all the marbles must be the same
-        owners = [marble['owner'] for marble in self ]
-        if not Reductors.equal(owners):
-            return False
-        self.owner = owners[0]
-
+        # owners = [marble['owner'] for marble in self ]
+        # if not Reductors.equal(owners):
+        #     return False
+        # self.owner = owners[0]
+        # self.owner = self[0]['owner']
         #the position of the marbles must be in line
         positions = [ marble['position'] for marble in self ]
         if not len(positions) == 1:
             rows = [ pos[0] for pos in positions ]
             columns = [ pos[1] for pos in positions ]
+            rows_consec = Reductors.consec(rows)
+            columns_consec = Reductors.consec(columns)
             if not any((
-                    Reductors.equal(rows) and Reductors.consec(columns),
-                    Reductors.consec(rows) and Reductors.equal(columns),
-                    Reductors.consec(rows) and Reductors.consec(columns))):
+                    Reductors.equal(rows) and columns_consec,
+                    rows_consec and Reductors.equal(columns),
+                    rows_consec and columns_consec)):
                 return False
         self.positions = positions
 
@@ -132,13 +156,14 @@ class Logic(Matrix):
         self.marbles = marbles
 
     def is_legal_move_logic(self,group, direction, current):
-        assert group.is_valid() and self.is_in_matrix(group), _('The group of marbles isn\'t valid.')
+        assert self.is_in_matrix(group), ERRORMSG1
         #make sure the moved group isn't thrown outside the grid:
         moved_group = self.get_moved(group, direction)
-        assert len(group) == len(moved_group) and moved_group.is_valid() and self.is_in_matrix(
+        assert len(group) == len(moved_group)  and self.is_in_matrix(
             moved_group)
 
-        assert group.owner == current, _('The marbles aren\'t yours.')
+
+        assert group.owner == current, ERRORMSG2
 
         obstacles = self.get_obstacles(group, direction)
 
@@ -146,16 +171,16 @@ class Logic(Matrix):
             moved_group = self.get_moved(group, direction)
 
         else:
-            assert not self.is_lateral_move(group, direction),_('You can\'t push an enemy in a lateral move.')
+            assert not self.is_lateral_move(group, direction), ERRORMSG3
 
             assert obstacles.is_valid()
-            assert obstacles.owner is not current, _('You can\'t push your own marbles.')
+            assert obstacles.owner is not current, ERRORMSG4
 
             enemy = self.get_mirror_obstacles(group, direction)
-            assert self.is_pushable(group, enemy), _('You can\'t push the enemy.')
+            assert self.is_pushable(group, enemy), ERRORMSG5
             moved_group = self.get_moved(group, direction)
         assert len(group) == len(moved_group) and moved_group.is_valid() and self.is_in_matrix(
-                moved_group), _('You can\'t move there.')
+                moved_group), ERRORMSG6
         return True
 
     def is_in_matrix(self, group):
@@ -167,26 +192,28 @@ class Logic(Matrix):
 
     def get_moved(self, group, direction):
         '''get_moved(group, direction) -> return the group moved in direction.
-        
+
         group -> Group instance.
         direction -> direction of movement, in range(6)'''
         diffs = 1, 1, 0, -1, -1, 0
-        try:
-            row_diff = diffs[direction + 1]
-        except IndexError:
-            row_diff = diffs[0]
+        row_diff = diffs[(direction + 1) % 6]
         column_diff = diffs[direction]
 
         l = []
         for marble in group:
-            try:
-                row = self.rows[self.rows.index(marble['position'][0]) + row_diff]
-                column = self.columns[self.columns.index(marble['position'][1]) + column_diff]
-            except IndexError:
-                pass
-            else:
-                if (row, column) in self:
-                    l.append(Marble((row, column), marble['owner']))
+            row = marble['position'][0] + row_diff
+            col = marble['position'][1] + column_diff
+            if row > 0 and row < 10 and col > 0 and col < 10:
+                if (row, col) in self:
+                    l.append(Marble((row, col), marble['owner']))
+                    # try:
+                    #     row = self.rows[self.rows.index(marble['position'][0]) + row_diff]
+                    #     column = self.columns[self.columns.index(marble['position'][1]) + column_diff]
+                    # except IndexError:
+                    #     pass
+                    # else:
+                    #     if (row, column) in self:
+                    #         l.append(Marble((row, column), marble['owner']))
         return Group(l)
 
     def get_obstacles(self, group, direction):
@@ -254,7 +281,7 @@ class Game_Board(object):
         self.initial = len(black), len(white)
 
     def get_marbles(self):
-        return self.marbles
+        return [Marble(marble['position'],marble['owner']) for marble in self.marbles]
 
     def get_initial(self):
         return self.initial
@@ -281,8 +308,8 @@ class Game_Board(object):
 
         self.logic.marbles = self.marbles
 
-        assert group.is_valid() and self.logic.is_in_matrix(group), _('The group of marbles isn\'t valid.')
-        assert group.owner == self.current, _('The marbles aren\'t yours.')
+        assert group.is_valid() and self.logic.is_in_matrix(group), ERRORMSG7
+        assert group.owner == self.current, ERRORMSG8
 
         obstacles = self.logic.get_obstacles(group, direction)
 
@@ -290,12 +317,12 @@ class Game_Board(object):
             moved_group = self.logic.get_moved(group, direction)
 
         else:
-            assert not self.logic.is_lateral_move(group, direction), _('You can\'t push an enemy in a lateral move.')
+            assert not self.logic.is_lateral_move(group, direction), ERRORMSG9
             assert obstacles.is_valid()
-            assert obstacles.owner is not self.current, _('You can\'t push your own marbles.')
+            assert obstacles.owner is not self.current, ERRORMSG10
 
             enemy = self.logic.get_mirror_obstacles(group, direction)
-            assert self.logic.is_pushable(group, enemy), _('You can\'t push the enemy.')
+            assert self.logic.is_pushable(group, enemy), ERRORMSG11
 
             moved_enemy = self.logic.get_moved(enemy, direction)
             if len(enemy) > len(moved_enemy):
@@ -305,7 +332,7 @@ class Game_Board(object):
 
             moved_group = self.logic.get_moved(group, direction)
 
-        assert len(group) == len(moved_group) and moved_group.is_valid() and self.logic.is_in_matrix(moved_group), _('You can\'t move there.')
+        assert len(group) == len(moved_group) and moved_group.is_valid() and self.logic.is_in_matrix(moved_group), ERRORMSG12
         for marble in group:
             if marble not in self.marbles:
                 print('hhh')

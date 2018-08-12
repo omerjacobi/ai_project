@@ -10,7 +10,7 @@ class Agent_repr(object):
     def __init__(self, type):
         self.agent = None
         if type == 'AlphaBetaAgent':
-            self.agent = alphaBetaAgent.AlphaBetaAgent(1)
+            self.agent = alphaBetaAgent.AlphaBetaAgent(2)
         if type == 'KeyboardAgent':
             self.agent = humanAgent.HumanAgent()
 
@@ -50,9 +50,9 @@ class Game(object):
                 state = gameState.GameState(marbles, initial)
                 self.board.changed = False
                 if player_index == 1:
-                    (group, direction) = self.player1.agent.get_action(state, player_index, self.board)
+                    self.player1.agent.get_action(state, player_index, self.board)
                 else:
-                    (group, direction) = self.player2.agent.get_action(state, player_index, self.board)
+                    self.player2.agent.get_action(state, player_index, self.board)
                 if self.board.get_looser():
                     break
                 player_index *= -1

@@ -1,6 +1,6 @@
 import itertools
 import numpy as np
-from abalone import Group, Logic ,Action
+from abalone import Group, Logic ,Action, Marble, MarbleManager
 import config
 import tk as abaloneTk
 from copy import deepcopy
@@ -10,7 +10,7 @@ WHITE = -1
 
 class GameState(object):
     def __init__(self, marbles, initial_length):
-        self._marbles = deepcopy(marbles)
+        self._marbles = marbles
         self._logic = Logic()
         self.initial = initial_length
 
@@ -62,8 +62,9 @@ class GameState(object):
         # if isinstance(positions_or_group, Group):
         #     group = positions_or_group
         # else:
-        group = Group(self._marbles.get_pos(positions_or_group.positions))
-
+        group = Group([Marble(marble['position'],marble['owner']) for marble in \
+                positions_or_group])
+        # group = Group(self._marbles.get_pos(positions_or_group.positions))
         self._logic.set_marbles(self._marbles)
         is_valid = self._logic.is_legal_move_logic(positions_or_group, direction, agent_index)
         if is_valid:
@@ -81,7 +82,9 @@ class GameState(object):
 
 
     def generate_successor(self, agent_index = 1, action = 5):
-        successor = GameState(self._marbles, self.initial)
+        new_marbles = MarbleManager([Marble(marble['position'],marble['owner']) for marble in \
+                self._marbles])
+        successor = GameState(new_marbles, self.initial)
         successor.apply_action(action, agent_index)
         return successor
 
