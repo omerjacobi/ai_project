@@ -25,7 +25,7 @@ class Game(object):
         self.board = self.create_board(board_type)
         self._state = None
         """if 'humanPlayer'=0 no player is human 1,2 indicate which is human, 3 means both are human"""
-        self.humanPlayers = int(agent1_type != 'KeyboardAgent') + int(agent2_type != 'KeyboardAgent') * 2
+        self.humanPlayers = int(agent1_type == 'KeyboardAgent') + int(agent2_type == 'KeyboardAgent') * 2
 
     def create_board(self, type):
         if type == 'SummaryDisplay':
