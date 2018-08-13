@@ -20,6 +20,7 @@ class HumanAgent():
         Returns the minimax action using self.evaluation_function
         """
         while not tk.changed:
+            tk.update()
             tk.update_idletasks()
             time.sleep(0.01)
         # game_state.apply_action(tk.lastMove, agent_index)

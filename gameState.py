@@ -58,7 +58,7 @@ class GameState(object):
         returns all of the possible moves of the group
         '''
         action_list=[]
-        for i in range(0, 6):
+        for i in [0,2,3,5]:
             try:
                 self._logic.set_marbles(self._marbles)
                 if self._logic.is_legal_move_logic(group, i, agent_index):

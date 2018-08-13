@@ -15,16 +15,16 @@
 
 class Board:
     tag = 'board'
-    fill = '#777777'
+    fill = '#0000FF'
 
 class Holes:
     tag = 'hole'
-    fill = '#FFFFFF'
+    fill = '#808080'
     outline = '#FFFFFF'
 
 class Marbles:
     tag = 'marble'
-    selected = '#555555'
+    selected = '#FF0000'
 
 class Players:
     class Black(int):
@@ -37,7 +37,7 @@ class Players:
                 ]
 
     class White(int):
-        fill = '#FF0000'
+        fill = '#FFFFFF'
         vp = 3
         positions = [
                 (9,5), (9,6), (9,7), (9,8), (9,9),
