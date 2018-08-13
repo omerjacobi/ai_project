@@ -16,6 +16,8 @@ class GameState(object):
         self.initial = initial_length
         self.arr_state_rpr = numpy.zeros(shape=(9, 9))#todo to make sure if this process is needed or can be spare
         self.create_state_string()
+        self.player_how_lost_marble=0
+
 
     def create_state_string(self):
         for marble in self._marbles:
@@ -82,7 +84,8 @@ class GameState(object):
             moved_group = self._logic.get_moved(group, direction)
             enemy = self._logic.get_mirror_obstacles(group, direction)
             moved_enemy = self._logic.get_moved(enemy, direction)
-            # if len(enemy) > len(moved_enemy):
+            if len(enemy) > len(moved_enemy):
+                self.player_how_lost_marble=agent_index*(-1)
             #     self._marbles.remove(enemy[-1])
             #     enemy.pop(-1)
             # enemy.update(moved_enemy)

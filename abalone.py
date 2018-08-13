@@ -284,7 +284,7 @@ class Game_Board(object):
         self.initial = len(black), len(white)
 
     def get_marbles(self):
-        return [Marble(marble['position'],marble['owner']) for marble in self.marbles]
+        return MarbleManager([Marble(marble['position'],marble['owner']) for marble in self.marbles])
 
     def get_initial(self):
         return self.initial

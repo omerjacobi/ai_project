@@ -6,7 +6,34 @@ from abalone import MarbleManager
 
 
 def eval_fn(game_state, agent_index):
-    return  eval.lost_marbles(game_state, agent_index) + eval.dist_from_center(game_state, agent_index)
+    score=0
+    if(eval.lost_marbles(game_state,agent_index)!=0):
+        score+=eval.lost_marbles(game_state,agent_index)*(1000)
+    if(len(game_state._marbles.get_owner(agent_index))<9):
+        score-=1000000
+    if (len(game_state._marbles.get_owner(agent_index*(-1))) < 9):
+        score += 1000000
+    dist_from_center=eval.dist_from_center(game_state,agent_index)
+    if(dist_from_center<24):
+        score+=400
+    elif(dist_from_center<30):
+        score+=300
+    elif(dist_from_center<35):
+        score+=200
+    elif(dist_from_center<40):
+        score+=100
+    group_score=eval.own_marbles_grouping(game_state, agent_index)
+    if(group_score>55):
+        score+=320
+    elif(group_score>50):
+        score+=240
+    elif(group_score>45):
+        score+=180
+    elif (group_score>40):
+        score+=80
+    score+=eval.attacking_opponent(game_state,agent_index)*(10)
+    score-=eval.attacked_by_opponent(game_state,agent_index)*(10)
+    return  score
 
 class AlphaBetaAgent():
     """
@@ -26,7 +53,7 @@ class AlphaBetaAgent():
             legal_moves = game_state.get_legal_actions(agent_index)
             if len(legal_moves) == 0:
                 return Action.STOP
-            action_list = game_state.get_legal_actions(agent_index)
+            action_list = game_state.get_legal_actions(agent_index) #todo change to legal moves
             best_score = float("-inf")
             # Action.Stop is always acpeted
             best_action = Action.STOP
@@ -58,7 +85,7 @@ class AlphaBetaAgent():
                 successor = game_state.generate_successor(agent_index, action)
                 # finish the depth tree
                 if depth == self.depth - 1:
-                    score = self.evaluation_function(successor, agent_index)
+                    score = self.evaluation_function(successor, -agent_index)
                     curr_state_str = successor.state_string + str(agent_index)
                     self.transposition_table[curr_state_str] = score
                 # continou to the tree
