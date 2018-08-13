@@ -21,6 +21,5 @@ class RandomAgent():
         index=random.randint(0,len(legal_moves)-1)
         board.move(legal_moves[index][0], True)
         board.update_idletasks()
-        board.update()
         return legal_moves[index][0]
 

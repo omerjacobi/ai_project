@@ -11,21 +11,27 @@ WHITE = -1
 
 class GameState(object):
     def __init__(self, marbles, initial_length):
-        self._marbles = marbles
+        self._marbles = MarbleManager(marbles)
         self._logic = Logic()
         self.initial = initial_length
-        self.arr_state_rpr = numpy.zeros(shape=(9, 9))#todo to make sure if this process is needed or can be spare
-        self.create_state_string()
+        self.arr_state_rpr = numpy.zeros(shape=(9, 9),dtype=np.int64)#todo to make sure if this process is
+        # needed or can be spare
         self.player_how_lost_marble=0
+        self.state_string_need_update = True
 
 
-    def create_state_string(self):
-        for marble in self._marbles:
-            if (marble['owner'] == 1):
-                self.arr_state_rpr[marble['position'][0] - 1][marble['position'][1] - 1] = 1
-            else:
-                self.arr_state_rpr[marble['position'][0] - 1][marble['position'][1] - 1] = 2
-        self.state_string = np.array2string(self.arr_state_rpr)
+    def create_state_string(self, player_index):
+        if self.state_string_need_update:
+            for marble in self._marbles:
+                if (marble['owner'] == 1):
+                    self.arr_state_rpr[marble['position'][0] - 1][marble['position'][1] - 1] = 1
+                else:
+                    self.arr_state_rpr[marble['position'][0] - 1][marble['position'][1] - 1] = 2
+
+            self._state_string = np.array2string(np.reshape(self.arr_state_rpr,newshape=(81)),
+                                                max_line_width=300)
+            self.state_string_need_update = False
+        return self._state_string + str(player_index)
 
     def get_looser(self):
         '''get_looser() -> get the looser team, False if no one.'''
@@ -69,49 +75,54 @@ class GameState(object):
 
 
     def apply_action(self, action, agent_index):
-        positions_or_group = action[0][0]
+        group = action[0][0]
         direction = action[0][1]
 
         # if isinstance(positions_or_group, Group):
         #     group = positions_or_group
         # else:
-        group = Group([Marble(marble['position'],marble['owner']) for marble in \
-                positions_or_group])
-        # group = Group(self._marbles.get_pos(positions_or_group.positions))
-        self._logic.set_marbles(self._marbles)
-        is_valid = self._logic.is_legal_move_logic(positions_or_group, direction, agent_index)
-        if is_valid:
-            moved_group = self._logic.get_moved(group, direction)
-            enemy = self._logic.get_mirror_obstacles(group, direction)
-            moved_enemy = self._logic.get_moved(enemy, direction)
-            if len(enemy) > len(moved_enemy):
-                self.player_how_lost_marble=agent_index*(-1)
+        # group = Group([Marble(marble['position'],marble['owner']) for marble in \
+        #         positions_or_group])
+
+        # is_valid = self._logic.is_legal_move_logic(positions_or_group, direction, agent_index)
+        # if is_valid:
+        #     moved_group = self._logic.get_moved(group, direction)
+        #     enemy = self._logic.get_mirror_obstacles(group, direction)
+        #     moved_enemy = self._logic.get_moved(enemy, direction)
+        #     if len(enemy) > len(moved_enemy):
+        #         self.player_how_lost_marble=agent_index*(-1)
             #     self._marbles.remove(enemy[-1])
             #     enemy.pop(-1)
             # enemy.update(moved_enemy)
             # group.update(moved_group)
-            for marble in group + enemy:
-                if marble not in self._marbles:
-                    print('hhh')
-                else:
-                    self._marbles.remove(marble)
+        group = action[0][0]
+        direction = action[0][1]
+        self._logic.set_marbles(self._marbles)
+        moved_group = self._logic.get_moved(group, direction)
+        enemy = self._logic.get_mirror_obstacles(group, direction)
+        moved_enemy = self._logic.get_moved(enemy, direction)
+        for marble in group + enemy:
+            if marble not in self._marbles:
+                print('hhh')
+            else:
+                self._marbles.remove(marble)
 
-            for marble in moved_group + moved_enemy:
-                if marble not in self._marbles:
-                    self._marbles.append(marble)
-                else:
-                    print('problem ; marble already inside')
+        for marble in moved_group + moved_enemy:
+            if marble not in self._marbles:
+                self._marbles.append(marble)
+            else:
+                print('problem ; marble already inside')
 
         looser = self.get_looser()
-        self.create_state_string()
+        self.state_string_need_update = True
         self.is_terminal = True if looser else False
 
 
 
-    def generate_successor(self, agent_index = 1, action = 5):
-        new_marbles = MarbleManager([Marble(marble['position'],marble['owner']) for marble in \
-                self._marbles])
-        successor = GameState(new_marbles, self.initial)
+    def generate_successor(self, agent_index = 1, action = Action.STOP):
+        # new_marbles = MarbleManager([Marble(marble['position'],marble['owner']) for marble in \
+        #         self._marbles])
+        successor = GameState(self._marbles, self.initial)
         successor.apply_action(action, agent_index)
         return successor
 

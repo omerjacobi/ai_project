@@ -21,7 +21,6 @@ class HumanAgent():
         """
         while not tk.changed:
             tk.update_idletasks()
-            tk.update()
             time.sleep(0.01)
         # game_state.apply_action(tk.lastMove, agent_index)
         return tk.lastMove[0]

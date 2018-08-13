@@ -43,9 +43,7 @@ BOTH=2
 class Action(list):
     STOP=5
     def __init__(self,group,direction):
-        new_group = [Marble(marble['position'],marble['owner']) for marble in group]
-
-        self.append((Group(new_group),direction))
+        self.append((Group(group),direction))
 
 
 class Matrix(list):
@@ -83,8 +81,7 @@ class MarbleManager(list):
         positions -> list of (row, column) tuples.'''
         return [ marble for marble in self if marble['position'] in positions ]
 
-    def __repr__(self):
-        return 'a'
+
 
 
     def get_owner(self, owner):
@@ -110,13 +107,13 @@ class Group(list):
         if len(marbles) > 0:
             self.owner = marbles[0]['owner']
 
-    def update(self, new):
-        '''update(updated_marbles) -> update the position attribute of
-        the marbles in the Group with the position attribute of others.
-        
-        updated_marbles -> updated marbles to get the position attr.'''
-        for old_m, new_m in zip(self, new):
-            old_m['position'] = new_m['position']
+    # def update(self, new):
+    #     '''update(updated_marbles) -> update the position attribute of
+    #     the marbles in the Group with the position attribute of others.
+    #
+    #     updated_marbles -> updated marbles to get the position attr.'''
+    #     for old_m, new_m in zip(self, new):
+    #         old_m['position'] = new_m['position']
 
 
     def is_valid(self):
@@ -162,9 +159,7 @@ class Logic(Matrix):
         assert self.is_in_matrix(group), ERRORMSG1
         #make sure the moved group isn't thrown outside the grid:
         moved_group = self.get_moved(group, direction)
-        assert len(group) == len(moved_group)  and self.is_in_matrix(
-            moved_group)
-
+        assert len(group) == len(moved_group)  and self.is_in_matrix(moved_group)
 
         assert group.owner == current, ERRORMSG2
 
@@ -191,7 +186,8 @@ class Logic(Matrix):
         False otherways.
         
         group -> Group instance.'''
-        return all([ marble['position'] in self for marble in group ])
+        return True
+        # return all([ marble['position'] in self for marble in group ])
 
     def get_moved(self, group, direction):
         '''get_moved(group, direction) -> return the group moved in direction.
@@ -315,7 +311,7 @@ class Game_Board(object):
         assert group.owner == self.current, ERRORMSG8
 
         obstacles = self.logic.get_obstacles(group, direction)
-
+        moved_enemy, enemy = [], []
         if not obstacles:
             moved_group = self.logic.get_moved(group, direction)
 
@@ -328,21 +324,16 @@ class Game_Board(object):
             assert self.logic.is_pushable(group, enemy), ERRORMSG11
 
             moved_enemy = self.logic.get_moved(enemy, direction)
-            if len(enemy) > len(moved_enemy):
-                self.marbles.remove(enemy[-1])
-                enemy.pop(-1)
-            enemy.update(moved_enemy)
-
             moved_group = self.logic.get_moved(group, direction)
 
         assert len(group) == len(moved_group) and moved_group.is_valid() and self.logic.is_in_matrix(moved_group), ERRORMSG12
-        for marble in group:
+        for marble in group + enemy:
             if marble not in self.marbles:
                 print('hhh')
             else:
                 self.marbles.remove(marble)
 
-        for marble in moved_group:
+        for marble in moved_group + moved_enemy:
             if marble not in self.marbles:
                 self.marbles.append(marble)
             else:

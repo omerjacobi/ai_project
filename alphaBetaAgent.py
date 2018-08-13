@@ -60,9 +60,11 @@ class AlphaBetaAgent():
             for index, action in enumerate(action_list):
                 if depth == 0:
                     print (index)
+
                 successor = game_state.generate_successor(agent_index, action)
-                if self.transposition_table.has_key(successor.state_string + str(agent_index)):
-                    score = self.transposition_table[successor.state_string + str(agent_index)]
+                successor_state_string = successor.create_state_string(agent_index)
+                if self.transposition_table.has_key(successor_state_string):
+                    score = self.transposition_table[successor_state_string]
                 else:
                     score = min_agent(successor, -agent_index, depth, alpha, beta)
                 if score > best_score:
@@ -86,14 +88,16 @@ class AlphaBetaAgent():
                 # finish the depth tree
                 if depth == self.depth - 1:
                     score = self.evaluation_function(successor, -agent_index)
-                    curr_state_str = successor.state_string + str(agent_index)
-                    self.transposition_table[curr_state_str] = score
+                    successor_state_string = successor.create_state_string(agent_index)
+                    self.transposition_table[successor_state_string] = score
                 # continou to the tree
 
                 else:
                     successor = game_state.generate_successor(agent_index, action)
-                    if self.transposition_table.has_key(successor.state_string + str(agent_index)):
-                        score = self.transposition_table[successor.state_string + str(agent_index)]
+                    successor_state_string = successor.create_state_string(agent_index)
+
+                    if self.transposition_table.has_key(successor_state_string):
+                        score = self.transposition_table[successor_state_string]
                     else:
                         score = max_agnet(successor, -agent_index, depth + 1, alpha, beta)
                 best_score = min(score, best_score)
@@ -105,7 +109,6 @@ class AlphaBetaAgent():
         a = max_agnet(game_state, agent_index,0, float("-inf"), float("inf"))
         board.move(a[0], True)
         board.update_idletasks()
-        board.update()
         return a[0]
 
 
