@@ -1,3 +1,5 @@
+import timeit
+
 import abalone
 import config
 import tk as abaloneTk
@@ -54,7 +56,12 @@ class Game(object):
                 if player_index == 1:
                     self.player1.agent.get_action(state, player_index, self.board)
                 else:
+                    start_time = timeit.default_timer()
                     self.player2.agent.get_action(state, player_index, self.board)
+
+                    elapsed = timeit.default_timer() - start_time
+
+                    print(elapsed)
                 if self.board.get_looser():
                     break
                 player_index *= -1

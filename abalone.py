@@ -1,20 +1,19 @@
-#Copyright (C) 2010 Unai Zalakain De Graeve
+# Copyright (C) 2010 Unai Zalakain De Graeve
 #
-#This program is free software: you can redistribute it and/or modify
-#it under the terms of the GNU General Public License as published by
-#the Free Software Foundation, either version 3 of the License, or
-#(at your option) any later version.
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
 #
-#This program is distributed in the hope that it will be useful,
-#but WITHOUT ANY WARRANTY; without even the implied warranty of
-#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#GNU General Public License for more details.
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
 #
-#You should have received a copy of the GNU General Public License
-#along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 '''Game logic of Abalone'''
-
 
 from operator import add, sub
 from gettext import gettext as _
@@ -22,8 +21,8 @@ from library import NoNegIndexList, Reductors
 from copy import deepcopy
 import numpy
 
-#representation of teams.
-#NOTE: they can't be 0.
+# representation of teams.
+# NOTE: they can't be 0.
 ERRORMSG12 = _('You can\'t move there.')
 ERRORMSG11 = _('You can\'t push the enemy.')
 ERRORMSG10 = _('You can\'t push your own marbles.')
@@ -38,12 +37,14 @@ ERRORMSG2 = _('The marbles aren\'t yours.')
 ERRORMSG1 = _('The group of marbles isn\'t valid.')
 BLACK = 1
 WHITE = -1
-BOTH=2
+BOTH = 2
+
 
 class Action(list):
-    STOP=5
-    def __init__(self,group,direction):
-        self.append((Group(group),direction))
+    STOP = 5
+
+    def __init__(self, group, direction):
+        self.append((Group(group), direction))
 
 
 class Matrix(list):
@@ -59,7 +60,8 @@ class Matrix(list):
         rows = iter(rows)
         for r in ranges:
             row = rows.next()
-            self.extend([ (row, column) for column in range(*r) ])
+            self.extend([(row, column) for column in range(*r)])
+
 
 class Marble(dict):
     '''Marble() -> dict with 'position' and 'owner' 
@@ -79,21 +81,16 @@ class MarbleManager(list):
         position key in positions.
         
         positions -> list of (row, column) tuples.'''
-        return [ marble for marble in self if marble['position'] in positions ]
-
-
-
+        return [marble for marble in self if marble['position'] in positions]
 
     def get_owner(self, owner):
         '''get_owner(owner) -> get the Marble objects that have their
         owner key == owner.
         
         owner -> BLACK or WHITE'''
-        if(owner==BOTH):
+        if (owner == BOTH):
             return [self]
-        return [ marble for marble in self if marble['owner'] == owner ]
-
-
+        return [marble for marble in self if marble['owner'] == owner]
 
 
 class Group(list):
@@ -121,45 +118,45 @@ class Group(list):
         If valid, set "owner" and "positions" attributes with the owner and
         the positions of the marbles.'''
 
-        #must have between 1 and 3 members
+        # must have between 1 and 3 members
         if not 1 <= len(self) <= 3:
             return False
 
-        #the owner of all the marbles must be the same
+        # the owner of all the marbles must be the same
         # owners = [marble['owner'] for marble in self ]
         # if not Reductors.equal(owners):
         #     return False
         # self.owner = owners[0]
         # self.owner = self[0]['owner']
-        #the position of the marbles must be in line
-        positions = [ marble['position'] for marble in self ]
+        # the position of the marbles must be in line
+        positions = [marble['position'] for marble in self]
         if not len(positions) == 1:
-            rows = [ pos[0] for pos in positions ]
-            columns = [ pos[1] for pos in positions ]
+            rows = [pos[0] for pos in positions]
+            columns = [pos[1] for pos in positions]
             rows_consec = Reductors.consec(rows)
             columns_consec = Reductors.consec(columns)
             if not any((
-                    Reductors.equal(rows) and columns_consec,
-                    rows_consec and Reductors.equal(columns),
-                    rows_consec and columns_consec)):
+                        Reductors.equal(rows) and columns_consec,
+                        rows_consec and Reductors.equal(columns),
+                        rows_consec and columns_consec)):
                 return False
         self.positions = positions
 
         return True
 
 
-
 class Logic(Matrix):
     '''Logic() -> group of methods with the game logic of abalone.'''
     marbles = []
+
     def set_marbles(self, marbles):
         self.marbles = marbles
 
-    def is_legal_move_logic(self,group, direction, current):
+    def is_legal_move_logic(self, group, direction, current):
         assert self.is_in_matrix(group), ERRORMSG1
-        #make sure the moved group isn't thrown outside the grid:
+        # make sure the moved group isn't thrown outside the grid:
         moved_group = self.get_moved(group, direction)
-        assert len(group) == len(moved_group)  and self.is_in_matrix(moved_group)
+        assert len(group) == len(moved_group) and self.is_in_matrix(moved_group)
 
         assert group.owner == current, ERRORMSG2
 
@@ -178,7 +175,7 @@ class Logic(Matrix):
             assert self.is_pushable(group, enemy), ERRORMSG5
             moved_group = self.get_moved(group, direction)
         assert len(group) == len(moved_group) and moved_group.is_valid() and self.is_in_matrix(
-                moved_group), ERRORMSG6
+            moved_group), ERRORMSG6
         return True
 
     def is_in_matrix(self, group):
@@ -222,8 +219,8 @@ class Logic(Matrix):
         group -> Group instance.
         direction -> direction of movement, in range(6).'''
         moved_group = self.get_moved(group, direction)
-        diff = [ marble['position'] for marble in moved_group if marble not in group ]
-        return Group([ marble for marble in self.marbles if marble['position'] in diff ])
+        diff = [marble['position'] for marble in moved_group if marble not in group]
+        return Group([marble for marble in self.marbles if marble['position'] in diff])
 
     def is_lateral_move(self, group, direction):
         '''is_lateral_move(group, direction) -> return True if the movement
@@ -232,7 +229,7 @@ class Logic(Matrix):
         group -> Group instance.
         direction -> direction of movement, in range(6).'''
         moved_group = self.get_moved(group, direction)
-        return all([ marble not in group for marble in moved_group ])
+        return all([marble not in group for marble in moved_group])
 
     def get_mirror_obstacles(self, group, direction):
         '''get_mirror_obstacles(group, direction) -> return the obstacles when
@@ -280,7 +277,7 @@ class Game_Board(object):
         self.initial = len(black), len(white)
 
     def get_marbles(self):
-        return MarbleManager([Marble(marble['position'],marble['owner']) for marble in self.marbles])
+        return MarbleManager([Marble(marble['position'], marble['owner']) for marble in self.marbles])
 
     def get_initial(self):
         return self.initial
@@ -326,7 +323,8 @@ class Game_Board(object):
             moved_enemy = self.logic.get_moved(enemy, direction)
             moved_group = self.logic.get_moved(group, direction)
 
-        assert len(group) == len(moved_group) and moved_group.is_valid() and self.logic.is_in_matrix(moved_group), ERRORMSG12
+        assert len(group) == len(moved_group) and moved_group.is_valid() and self.logic.is_in_matrix(
+            moved_group), ERRORMSG12
         for marble in group + enemy:
             if marble not in self.marbles:
                 print('hhh')
@@ -339,9 +337,7 @@ class Game_Board(object):
             else:
                 print('problem ; marble already inside')
         # group.update(moved_group)
-        return Action(moved_group,direction)
-
-
+        return Action(moved_group, direction)
 
     def is_valid_move(self, positions_or_group, direction):
         if isinstance(positions_or_group, Group):

@@ -97,10 +97,10 @@ class Board(Canvas):
         for pos in self.matrix:
             t, b = circle(self.get_coord(pos), self.edge / 9)
             self.create_oval(
-                t.x, t.y, b.x, b.y,
-                fill=config.Holes.fill,
-                outline=config.Holes.outline,
-                tags=config.Holes.tag)
+                    t.x, t.y, b.x, b.y,
+                    fill=config.Holes.fill,
+                    outline=config.Holes.outline,
+                    tags=config.Holes.tag)
 
     def draw_marbles(self):
         '''draw_marbles() -> draw the marbles.'''
@@ -135,7 +135,7 @@ class Board(Canvas):
                         self.selected = Group([])
                 else:
                     # assert marble['owner'] == self.master.current
-                    if (marble['owner'] != self.master.current):
+                    if(marble['owner'] != self.master.current):
                         tkMessageBox.showinfo("Hey",
                                               "It's Not Your Turn!")
                         continue

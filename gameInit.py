@@ -15,7 +15,6 @@ import os
 import config
 
 
-
 class GameRunner(object):
     def __init__(self, board=None, agent1=None, agent2=None):
         super(GameRunner, self).__init__()
@@ -48,24 +47,24 @@ class GameRunner(object):
 def main():
     parser = argparse.ArgumentParser(description='Abalone game.')
     displays = ['GUI', 'SummaryDisplay']
-    agents = ['KeyboardAgent', 'MonteCarlo', 'AlphaBetaAgent','RandomAgent']
+    agents = ['KeyboardAgent', 'MonteCarlo', 'AlphaBetaAgent', 'RandomAgent']
     parser.add_argument('--display', choices=displays, help='The game ui.', default=displays[0], type=str)
     parser.add_argument('--agent1', choices=agents, help='The agent.', default=agents[2], type=str)
     parser.add_argument('--agent2', choices=agents, help='The agent.', default=agents[2], type=str)
-    parser.add_argument('--depth', help='The maximum depth for to search in the game tree.', default=2, type=int)
+    parser.add_argument('--depth', help='The maximum depth for to search in the game tree.', default=2,
+                        type=int)
     parser.add_argument('--num_of_games', help='The number of games to run.', default=1, type=int)
     parser.add_argument('--initial_board', help='Initial board for new games.', default=None, type=str)
-    #TODO check if keyboard and SummaryDisplay
+    # TODO check if keyboard and SummaryDisplay
     args = parser.parse_args()
     if args.initial_board is not None:
-        a=1
-        #TODO implement here diffrent start board
+        a = 1
+        # TODO implement here diffrent start board
     board = args.display
-        #TODO implement diffrent boards kind (display/no display)
+    # TODO implement diffrent boards kind (display/no display)
     game_runner = GameRunner(board=board, agent1=args.agent1, agent2=args.agent2)
     for i in range(args.num_of_games):
         score = game_runner.new_game()
-
 
 
 if __name__ == '__main__':
