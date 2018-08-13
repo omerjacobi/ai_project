@@ -275,7 +275,7 @@ class Game_Board(object):
         )
         self.current = BLACK
         self.initial = len(black), len(white)
-
+        self.end_of_game=False
     def get_marbles(self):
         return MarbleManager([Marble(marble['position'], marble['owner']) for marble in self.marbles])
 
@@ -285,7 +285,7 @@ class Game_Board(object):
     def get_looser(self):
         '''get_looser() -> get the looser team, False if no one.'''
         for team, initial in zip((BLACK, WHITE), self.initial):
-            if initial - len(self.marbles.get_owner(team)) >= initial / (14 / 6.0):
+            if initial - len(self.marbles.get_owner(team)) >=6:
                 return team
         return False
 

@@ -38,7 +38,7 @@ class Game(object):
             return abaloneTk.Game_Board()
         return None
 
-    def run(self):
+    def run(self,batch_num=1):
         self.board.start(config.Players.Black.positions, config.Players.White.positions)
         initial = self.board.get_initial()
         player_index = 1
@@ -65,7 +65,3 @@ class Game(object):
                 if self.board.get_looser():
                     break
                 player_index *= -1
-    #
-    # def initializeForHuman(self):
-    #     self.tkState = abaloneTk.Game_Board()
-    #     self.tkState.start(config.Players.Black.positions, config.Players.White.positions)

@@ -250,14 +250,17 @@ class Game_Board(abalone.Game_Board, Tk):
         self.next()
         looser = self.get_looser()
         if looser:
-            print(looser)
+            print("team "+str(looser)+ " lost the game")
             self.stop()
-        self.board.draw_marbles()
-        self.changed = True
+            #continue
+        else:
+            self.board.draw_marbles()
+            self.changed = True
 
 
     def stop(self):
         '''stop() -> destroy the current game.'''
+        self.end_of_game=True
         self.board.destroy()
         self.movement.destroy()
         self.viewpoint.destroy()

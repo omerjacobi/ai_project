@@ -1,14 +1,14 @@
 import itertools
 import numpy as np
 from abalone import Group, Logic, Action, Marble, MarbleManager
-import config
-import tk as abaloneTk
-from copy import deepcopy
+import multiprocessing
 import numpy
-import timeit
 
 BLACK = 1
 WHITE = -1
+
+def unwrap_self_g(arg, **kwarg):
+    return GameState.get_all_moves2(*arg, **kwarg)
 
 
 class GameState(object):
@@ -41,6 +41,52 @@ class GameState(object):
                 return team
         return False
 
+    # def get_legal_actions(self, agent_index):
+    #     "returns all of the legal moves of the current player.todo implement get_all_moves in group class"
+    #
+    #     legal_actions = []
+    #     player_marbles = self._marbles.get_owner(agent_index)
+    #     for i in range(1, 4):
+    #         for subset in itertools.combinations(player_marbles, i):
+    #             group = Group(subset)
+    #             if group.is_valid():
+    #                 pool=multiprocessing.Pool(multiprocessing.cpu_count())
+    #                 curlist=pool.apply_async(unwrap_self_g,group,agent_index,self._marbles).get()
+    #                 legal_actions +=curlist
+    #                 pool.terminate()
+    #     legal_actions.reverse()
+    #     return legal_actions
+    #
+    # def get_all_moves(self, group, agent_index):
+    #     '''
+    #     returns all of the possible moves of the group
+    #     '''
+    #     action_list = []
+    #     for i in [0,1,2, 3, 4, 5]:
+    #         try:
+    #             self._logic.set_marbles(self._marbles)
+    #             if self._logic.is_legal_move_logic(group, i, agent_index):
+    #                 act = Action(group, i)
+    #                 action_list.append(act)
+    #         except AssertionError:
+    #             continue
+    #     return action_list
+    #
+    # def get_all_moves2(self, group, agent_index,marbles):
+    #     '''
+    #     returns all of the possible moves of the group
+    #     '''
+    #     action_list = []
+    #     for i in [0,1,2, 3, 4, 5]:
+    #         try:
+    #             logic=Logic()
+    #             if logic.is_legal_move_logic(group, i, agent_index):
+    #                 act = Action(group, i)
+    #                 action_list.append(act)
+    #         except AssertionError:
+    #             continue
+    #     return action_list
+
     def get_legal_actions(self, agent_index):
         "returns all of the legal moves of the current player.todo implement get_all_moves in group class"
 
@@ -59,7 +105,7 @@ class GameState(object):
         returns all of the possible moves of the group
         '''
         action_list = []
-        for i in [0, 1, 2, 3, 4, 5]:
+        for i in [0,1,2, 3, 4, 5]:
             try:
                 self._logic.set_marbles(self._marbles)
                 if self._logic.is_legal_move_logic(group, i, agent_index):
@@ -74,29 +120,8 @@ class GameState(object):
         return np.where(self._board == 0)
 
     def apply_action(self, action, agent_index):
-        group = action[0][0]
-        direction = action[0][1]
-
-        # if isinstance(positions_or_group, Group):
-        #     group = positions_or_group
-        # else:
-        # group = Group([Marble(marble['position'],marble['owner']) for marble in \
-        #         positions_or_group])
-
-        # is_valid = self._logic.is_legal_move_logic(positions_or_group, direction, agent_index)
-        # if is_valid:
-        #     moved_group = self._logic.get_moved(group, direction)
-        #     enemy = self._logic.get_mirror_obstacles(group, direction)
-        #     moved_enemy = self._logic.get_moved(enemy, direction)
-        #     if len(enemy) > len(moved_enemy):
-        #         self.player_how_lost_marble=agent_index*(-1)
-        #     self._marbles.remove(enemy[-1])
-        #     enemy.pop(-1)
-        # enemy.update(moved_enemy)
-        # group.update(moved_group)
-        group = action[0][0]
-        direction = action[0][1]
-        self._logic.set_marbles(self._marbles)
+        (group,direction)=(action[0][0],action[0][1])
+        self._logic.marbles=self._marbles
         moved_group = self._logic.get_moved(group, direction)
         enemy = self._logic.get_mirror_obstacles(group, direction)
         moved_enemy = self._logic.get_moved(enemy, direction)
