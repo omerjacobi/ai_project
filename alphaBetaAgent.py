@@ -1,8 +1,7 @@
 import numpy as np
 import Evaluation as eval
-from abalone import Action
-from abalone import Marble
-from abalone import MarbleManager
+from abalone import Action, Marble, MarbleManager
+import tk
 
 
 def eval_fn(game_state, agent_index):
@@ -36,12 +35,43 @@ def eval_fn(game_state, agent_index):
     return score
 
 
+def aggressive_eval_fn(game_state, agent_index):
+    score = 0
+    if eval.lost_marbles(game_state, agent_index) != 0:
+        score += eval.lost_marbles(game_state, agent_index) * 1000
+    if len(game_state._marbles.get_owner(agent_index)) < 9:
+        score -= 1000000
+    if len(game_state._marbles.get_owner(agent_index * (-1))) < 9:
+        score += 1000000
+    dist_from_center = eval.dist_from_center(game_state, agent_index)
+    if dist_from_center < 24:
+        score += 800
+    elif dist_from_center < 30:
+        score += 600
+    elif dist_from_center < 35:
+        score += 400
+    elif dist_from_center < 40:
+        score += 200
+    group_score = eval.own_marbles_grouping(game_state, agent_index)
+    if group_score > 55:
+        score += 80
+    elif group_score > 50:
+        score += 60
+    elif group_score > 45:
+        score += 45
+    elif group_score > 40:
+        score += 20
+    score += eval.attacking_opponent(game_state, agent_index) * 800
+    score -= eval.attacked_by_opponent(game_state, agent_index) * 800
+    return score
+
+
 class AlphaBetaAgent():
     """
     Minimax agent with alpha-beta pruning
     """
 
-    def __init__(self, depth, evaluation_function=eval_fn):
+    def __init__(self, depth, evaluation_function=aggressive_eval_fn):
         self.depth = depth
         self.evaluation_function = evaluation_function
         self.transposition_table = dict()
@@ -50,8 +80,9 @@ class AlphaBetaAgent():
         """
         Returns the minimax action using self.evaluation_function
         """
+        # self.evaluation_function = eval_fn if agent_index == 1 else aggressive_eval_fn
 
-        def max_agnet(game_state, agent_index, depth, alpha, beta):
+        def max_agent(game_state, agent_index, depth, alpha, beta):
 
             legal_moves = game_state.get_legal_actions(agent_index)
             if len(legal_moves) == 0:
@@ -106,7 +137,7 @@ class AlphaBetaAgent():
                     if self.transposition_table.has_key(successor_state_string):
                         score = self.transposition_table[successor_state_string]
                     else:
-                        score = max_agnet(successor, -agent_index, depth + 1, alpha, beta)
+                        score = max_agent(successor, -agent_index, depth + 1, alpha, beta)
                 best_score = min(score, best_score)
                 beta = min(beta, best_score)
                 if alpha >= beta:
@@ -114,9 +145,13 @@ class AlphaBetaAgent():
             return best_score
 
         game_state = self.marble_list_creator(game_state)
-        a = max_agnet(game_state, agent_index, 0, float("-inf"), float("inf"))
-        board.move(a[0], True)
-        board.update_idletasks()
+        a = max_agent(game_state, agent_index, 0, float("-inf"), float("inf"))
+        if isinstance(board, tk.Game_Board):
+            board.move(a[0], True)
+            board.update_idletasks()
+        else:
+            board.move(a[0][0], a[0][1])
+            board.next()
         return a[0]
 
     def marble_list_creator(self, state):

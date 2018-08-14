@@ -2,6 +2,7 @@ import random
 from abalone import Action
 from abalone import Marble
 from abalone import MarbleManager
+import tk
 
 
 class RandomAgent():
@@ -21,6 +22,10 @@ class RandomAgent():
         if len(legal_moves) == 0:
             return Action.STOP
         index = random.randint(0, len(legal_moves) - 1)
-        board.move(legal_moves[index][0], True)
-        board.update_idletasks()
+        if isinstance(board, tk.Game_Board):
+            board.move(legal_moves[index][0], True)
+            board.update_idletasks()
+        else:
+            board.move(legal_moves[index][0][0], legal_moves[index][0][1])
+            board.next()
         return legal_moves[index][0]
