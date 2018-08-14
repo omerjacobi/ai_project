@@ -16,16 +16,17 @@ import config
 
 
 class GameRunner(object):
-    def __init__(self, board=None, agent1=None, agent2=None):
+    def __init__(self, board=None, agent1=None, agent2=None,depth=None):
         super(GameRunner, self).__init__()
         self._agent1 = agent1
         self._agent2 = agent2
         self.board = board
+        self.depth=depth
         self.current_game = None
 
     def new_game(self, *args, **kw):
         self.quit_game()
-        game = gameManager.Game(self._agent1, self._agent2, self.board)
+        game = gameManager.Game(self._agent1, self._agent2, self.board,self.depth)
         self.current_game = game
         return game.run()
 
@@ -62,7 +63,7 @@ def main():
         # TODO implement here diffrent start board
     board = args.display
     # TODO implement diffrent boards kind (display/no display)
-    game_runner = GameRunner(board=board, agent1=args.agent1, agent2=args.agent2)
+    game_runner = GameRunner(board=board, agent1=args.agent1, agent2=args.agent2,depth=args.depth)
     for i in range(args.num_of_games):
         score = game_runner.new_game()
 

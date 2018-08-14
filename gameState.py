@@ -37,7 +37,7 @@ class GameState(object):
     def get_looser(self):
         '''get_looser() -> get the looser team, False if no one.'''
         for team, initial in zip((BLACK, WHITE), self.initial):
-            if initial - len(self._marbles.get_owner(team)) >= initial / (14 / 6.0):
+            if initial - len(self._marbles.get_owner(team)) >=6:
                 return team
         return False
 
