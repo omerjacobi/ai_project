@@ -46,6 +46,9 @@ class Action(list):
     def __init__(self, group, direction):
         self.append((Group(group), direction))
 
+    def __hash__(self):
+        return tuple(self[0]).__hash__
+
 
 class Matrix(list):
     '''Matrix() -> list with all the positions of an abalone's board.'''
@@ -70,6 +73,9 @@ class Marble(dict):
     def __init__(self, position, owner):
         self['position'] = position
         self['owner'] = owner
+
+    def __hash__(self):
+        return dict.__hash__(self)
 
 
 class MarbleManager(list):
@@ -100,9 +106,16 @@ class Group(list):
     def __init__(self, marbles=[]):
         # assert all([ isinstance(marble, Marble) for marble in marbles ]), self.__doc__
         self.extend(sorted(marbles, key=lambda marble: marble['position']))
-        self.owner = 0
-        if len(marbles) > 0:
-            self.owner = marbles[0]['owner']
+
+
+    def get_owner(self):
+        if (len(self)) > 0:
+            return self[0]['owner']
+        return 0
+
+
+    def __hash__(self):
+        return list(self).__hash__
 
     # def update(self, new):
     #     '''update(updated_marbles) -> update the position attribute of
@@ -158,7 +171,7 @@ class Logic(Matrix):
         moved_group = self.get_moved(group, direction)
         assert len(group) == len(moved_group) and self.is_in_matrix(moved_group)
 
-        assert group.owner == current, ERRORMSG2
+        assert group.get_owner() == current, ERRORMSG2
 
         obstacles = self.get_obstacles(group, direction)
 
@@ -169,7 +182,7 @@ class Logic(Matrix):
             assert not self.is_lateral_move(group, direction), ERRORMSG3
 
             assert obstacles.is_valid()
-            assert obstacles.owner is not current, ERRORMSG4
+            assert obstacles.get_owner() is not current, ERRORMSG4
 
             enemy = self.get_mirror_obstacles(group, direction)
             assert self.is_pushable(group, enemy), ERRORMSG5
@@ -305,7 +318,7 @@ class Game_Board(object):
         self.logic.marbles = self.marbles
 
         assert group.is_valid() and self.logic.is_in_matrix(group), ERRORMSG7
-        assert group.owner == self.current, ERRORMSG8
+        assert group.get_owner() == self.current, ERRORMSG8
 
         obstacles = self.logic.get_obstacles(group, direction)
         moved_enemy, enemy = [], []
@@ -315,7 +328,7 @@ class Game_Board(object):
         else:
             assert not self.logic.is_lateral_move(group, direction), ERRORMSG9
             assert obstacles.is_valid()
-            assert obstacles.owner is not self.current, ERRORMSG10
+            assert obstacles.get_owner() is not self.current, ERRORMSG10
 
             enemy = self.logic.get_mirror_obstacles(group, direction)
             assert self.logic.is_pushable(group, enemy), ERRORMSG11

@@ -15,6 +15,7 @@ import randomAgent
 import gameState
 import tk
 import evaluation as eval
+import alphaBetaAgent
 
 import random,util,math
 
@@ -81,7 +82,8 @@ class QLearningAgent(ReinforcementAgent):
   def training(self):
       board = abalone.Game_Board()
       board.start(config.Players.Black.positions, config.Players.White.positions)
-      enemy = randomAgent.RandomAgent()
+      # enemy = randomAgent.RandomAgent()
+      enemy = alphaBetaAgent.AlphaBetaAgent(depth=1)
       initial = board.get_initial()
       for i in range(self.numTraining):
           self.startEpisode()
@@ -89,7 +91,7 @@ class QLearningAgent(ReinforcementAgent):
             state = gameState.GameState(board.get_marbles(), initial)
             action = self.getAction(state, self.agent_index, board)
             new_state = gameState.GameState(board.get_marbles(), initial)
-            self.update(state, action, new_state, eval_fn(new_state) - eval_fn(state), self.agent_index)
+            self.update(state, action, new_state, eval_fn(new_state, self.agent_index) - eval_fn(state, self.agent_index), self.agent_index)
             if board.get_looser():
                 state = new_state
                 break
@@ -106,7 +108,20 @@ class QLearningAgent(ReinforcementAgent):
       Should return 0.0 if we never seen
       a state or (state,action) tuple
     """
-    return self.q_values[state, action]
+
+    return self.q_values[self.generate_string(action, state)]
+
+  def generate_string(self, action, state):
+      action_list = list()
+      group = action[0][0]
+      for marble in group:
+          action_list.append((marble['owner'], marble['position']))
+      action_list = str(action_list)
+      state_list = list()
+      for marble in state._marbles:
+          state_list.append((marble['owner'], marble['position']))
+      state_list = str(state_list)
+      return action_list, state_list
 
   def getMaxQValueActionPair(self, state, player_index):
       legal_actions = state.get_legal_actions(player_index)
@@ -120,7 +135,8 @@ class QLearningAgent(ReinforcementAgent):
               best_res = q_val
               best_action = action
           elif q_val == best_res:
-              best_action = np.random.choice([best_action, action])
+              rand_index = np.random.randint(2)
+              best_action = best_action if rand_index == 1 else action
       return best_res, best_action
 
   def getValue(self, state, player_index):
@@ -156,7 +172,8 @@ class QLearningAgent(ReinforcementAgent):
     action = None
     if len(legal_actions) > 0:
       if util.flipCoin(self.epsilon):
-        action = np.random.choice(legal_actions)
+        rand_index = np.random.randint(len(legal_actions))
+        action = legal_actions[rand_index]
       else:
         action = self.getPolicy(state, player_index)
     if isinstance(board, tk.Game_Board):
@@ -177,7 +194,8 @@ class QLearningAgent(ReinforcementAgent):
       NOTE: You should never call this function,
       it will be called on your behalf
     """
-    self.q_values[state, action] = ((1 - self.alpha) * self.q_values[state, action]) + \
+    string = self.generate_string(action, state)
+    self.q_values[string] = ((1 - self.alpha) * self.q_values[string]) + \
                                     self.alpha * (reward + self.discount * self.getMaxQValueActionPair(nextState, player_index)[0])
 
 
