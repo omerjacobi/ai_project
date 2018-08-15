@@ -10,7 +10,7 @@ import randomAgent
 import approximateQAgent
 
 class Agent_repr(object):
-    def __init__(self, type, depth, num_of_training):
+    def __init__(self, type, depth, num_of_training, player_index):
         self.agent = None
         if type == 'AlphaBetaAgent':
             self.agent = alphaBetaAgent.AlphaBetaAgent(depth)
@@ -19,7 +19,7 @@ class Agent_repr(object):
         if type == 'RandomAgent':
             self.agent = randomAgent.RandomAgent()
         if type == 'QLearningAgent':
-            self.agent = approximateQAgent.QLearningAgent(numTraining=num_of_training)
+            self.agent = approximateQAgent.QLearningAgent(player_index, numTraining=num_of_training)
 
 
 
@@ -27,8 +27,8 @@ class Game(object):
     def __init__(self, agent1_type, agent2_type, board_type,depth, num_of_training):
         super(Game, self).__init__()
         self.tkState = None
-        self.player1 = Agent_repr(agent1_type, depth, num_of_training)
-        self.player2 = Agent_repr(agent2_type, depth, num_of_training)
+        self.player1 = Agent_repr(agent1_type, depth, num_of_training, 1)
+        self.player2 = Agent_repr(agent2_type, depth, num_of_training, -1)
         self.board = self.create_board(board_type)
         self.depth = depth
         self._state = None
@@ -67,7 +67,7 @@ class Game(object):
 
                     elapsed = timeit.default_timer() - start_time
 
-                    print(elapsed)
+                    # print(elapsed)
                 if self.board.get_looser():
                     return self.board.get_looser(), turn_counter
                 player_index *= -1

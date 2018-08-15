@@ -24,12 +24,14 @@ class GameRunner(object):
         self.depth=depth
         self.current_game = None
         self.num_of_training = num_of_training
+        self.game = None
 
     def new_game(self, *args, **kw):
         # self.quit_game()
-        game = gameManager.Game(self._agent1, self._agent2, self.board,self.depth, self.num_of_training)
-        self.current_game = game
-        return game.run()
+        if not self.game:
+            self.game = gameManager.Game(self._agent1, self._agent2, self.board, self.depth, self.num_of_training)
+        self.current_game = self.game
+        return self.game.run()
 
     def quit_game(self):
         if self.current_game is not None:

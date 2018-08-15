@@ -72,11 +72,11 @@ class QLearningAgent(ReinforcementAgent):
         which returns legal actions
         for a state
   """
-  def __init__(self, alpha=1.0, epsilon=0.05, gamma=0.8, numTraining = 10):
+  def __init__(self, player_index=0, alpha=1.0, epsilon=0.05, gamma=0.8, numTraining = 10):
     "You can initialize Q-values here..."
     ReinforcementAgent.__init__(self, alpha=alpha, epsilon=epsilon, gamma=gamma, numTraining=numTraining)
     self.q_values = util.Counter()
-    self.agent_index = 1
+    self.agent_index = player_index
     self.training()
 
   def training(self):
@@ -102,6 +102,7 @@ class QLearningAgent(ReinforcementAgent):
                 break
           self.update(state, action, new_state, eval_fn(new_state, self.agent_index) - eval_fn(state, self.agent_index), self.agent_index)
           print("Finished Traing number: " + str(i+1))
+          print("Training winner is: QLearner" if state.get_looser() == -1 else "Training winner is: enemy")
       print("Finished training!!!!!!!")
 
   def getQValue(self, state, action):
@@ -217,22 +218,22 @@ class PacmanQAgent(QLearningAgent):
   "Exactly the same as QLearningAgent, but with different default parameters"
 
   def __init__(self, epsilon=0.05,gamma=0.8,alpha=0.2, numTraining=0, **args):
-    """
-    These default parameters can be changed from the pacman.py command line.
-    For example, to change the exploration rate, try:
-        python pacman.py -p PacmanQLearningAgent -a epsilon=0.1
+      """
+      These default parameters can be changed from the pacman.py command line.
+      For example, to change the exploration rate, try:
+          python pacman.py -p PacmanQLearningAgent -a epsilon=0.1
 
-    alpha    - learning rate
-    epsilon  - exploration rate
-    gamma    - discount factor
-    numTraining - number of training episodes, i.e. no learning after these many episodes
-    """
-    args['epsilon'] = epsilon
-    args['gamma'] = gamma
-    args['alpha'] = alpha
-    args['numTraining'] = numTraining
-    self.index = 0  # This is always Pacman
-    QLearningAgent.__init__(self, **args)
+      alpha    - learning rate
+      epsilon  - exploration rate
+      gamma    - discount factor
+      numTraining - number of training episodes, i.e. no learning after these many episodes
+      """
+      args['epsilon'] = epsilon
+      args['gamma'] = gamma
+      args['alpha'] = alpha
+      args['numTraining'] = numTraining
+      self.index = 0  # This is always Pacman
+      QLearningAgent.__init__(0)
 
   def getAction(self, state):
     """
