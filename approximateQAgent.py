@@ -80,27 +80,29 @@ class QLearningAgent(ReinforcementAgent):
     self.training()
 
   def training(self):
-      board = abalone.Game_Board()
-      board.start(config.Players.Black.positions, config.Players.White.positions)
       # enemy = randomAgent.RandomAgent()
       enemy = alphaBetaAgent.AlphaBetaAgent(depth=1)
-      initial = board.get_initial()
       for i in range(self.numTraining):
+          board = abalone.Game_Board()
+          board.start(config.Players.Black.positions, config.Players.White.positions)
+          initial = board.get_initial()
           self.startEpisode()
           while True:
             state = gameState.GameState(board.get_marbles(), initial)
             action = self.getAction(state, self.agent_index, board)
             new_state = gameState.GameState(board.get_marbles(), initial)
+            if board.get_looser():
+                break
             self.update(state, action, new_state, eval_fn(new_state, self.agent_index) - eval_fn(state, self.agent_index), self.agent_index)
-            if board.get_looser():
-                state = new_state
-                break
             # Time for enemy move
-            enemy.get_action(new_state, -self.agent_index, board)
+            state = new_state
+            enemy.get_action(state, -self.agent_index, board)
             if board.get_looser():
-                state = gameState.GameState(board.get_marbles(), initial)
+                new_state = gameState.GameState(board.get_marbles(), initial)
                 break
-          self.final(state)
+          self.update(state, action, new_state, eval_fn(new_state, self.agent_index) - eval_fn(state, self.agent_index), self.agent_index)
+          print("Finished Traing number: " + str(i+1))
+      print("Finished training!!!!!!!")
 
   def getQValue(self, state, action):
     """
