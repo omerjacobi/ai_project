@@ -87,22 +87,24 @@ class QLearningAgent(ReinforcementAgent):
           board.start(config.Players.Black.positions, config.Players.White.positions)
           initial = board.get_initial()
           self.startEpisode()
+          curr_index = 1
           while True:
             state = gameState.GameState(board.get_marbles(), initial)
-            action = self.getAction(state, self.agent_index, board)
-            new_state = gameState.GameState(board.get_marbles(), initial)
-            if board.get_looser():
-                break
-            self.update(state, action, new_state, eval_fn(new_state, self.agent_index) - eval_fn(state, self.agent_index), self.agent_index)
-            # Time for enemy move
-            state = new_state
-            enemy.get_action(state, -self.agent_index, board)
-            if board.get_looser():
+            if self.agent_index == curr_index:
+                action = self.getAction(state, curr_index, board)
                 new_state = gameState.GameState(board.get_marbles(), initial)
-                break
-          self.update(state, action, new_state, eval_fn(new_state, self.agent_index) - eval_fn(state, self.agent_index), self.agent_index)
+                self.update(state, action, new_state, eval_fn(new_state, self.agent_index) - eval_fn(state, self.agent_index), self.agent_index)
+                if board.get_looser():
+                    break
+            else:
+                enemy.get_action(state, curr_index, board)
+                if board.get_looser():
+                    new_state = gameState.GameState(board.get_marbles(), initial)
+                    self.update(state, action, new_state, eval_fn(new_state, self.agent_index) - eval_fn(state, self.agent_index), self.agent_index)
+                    break
+            curr_index *= -1
           print("Finished Traing number: " + str(i+1))
-          print("Training winner is: QLearner" if state.get_looser() == -1 else "Training winner is: enemy")
+          print("Training winner is: QLearner" if board.get_looser() != self.agent_index else "Training winner is: enemy")
       print("Finished training!!!!!!!")
 
   def getQValue(self, state, action):
