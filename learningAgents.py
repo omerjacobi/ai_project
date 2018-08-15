@@ -50,34 +50,34 @@ class ValueEstimationAgent(Agent):
     """
     util.raiseNotDefined()
 
-  def getValue(self, state):
-    """
-    What is the value of this state under the best action?
-    Concretely, this is given by
+  # def getValue(self, state):
+  #   """
+  #   What is the value of this state under the best action?
+  #   Concretely, this is given by
+  #
+  #   V(s) = max_{a in actions} Q(s,a)
+  #   """
+  #   util.raiseNotDefined()
+  #
+  # def getPolicy(self, state):
+  #   """
+  #   What is the best action to take in the state. Note that because
+  #   we might want to explore, this might not coincide with getAction
+  #   Concretely, this is given by
+  #
+  #   policy(s) = arg_max_{a in actions} Q(s,a)
+  #
+  #   If many actions achieve the maximal Q-value,
+  #   it doesn't matter which is selected.
+  #   """
+  #   util.raiseNotDefined()
 
-    V(s) = max_{a in actions} Q(s,a)
-    """
-    util.raiseNotDefined()
-
-  def getPolicy(self, state):
-    """
-    What is the best action to take in the state. Note that because
-    we might want to explore, this might not coincide with getAction
-    Concretely, this is given by
-
-    policy(s) = arg_max_{a in actions} Q(s,a)
-
-    If many actions achieve the maximal Q-value,
-    it doesn't matter which is selected.
-    """
-    util.raiseNotDefined()
-
-  def getAction(self, state):
-    """
-    state: can call state.getLegalActions()
-    Choose an action and return it.
-    """
-    util.raiseNotDefined()
+  # def getAction(self, state):
+  #   """
+  #   state: can call state.getLegalActions()
+  #   Choose an action and return it.
+  #   """
+  #   util.raiseNotDefined()
 
 class ReinforcementAgent(ValueEstimationAgent):
   """
@@ -97,12 +97,12 @@ class ReinforcementAgent(ValueEstimationAgent):
   #    Override These Functions      #
   ####################################
 
-  def update(self, state, action, nextState, reward):
-    """
-	    This class will call this function, which you write, after
-	    observing a transition and reward
-    """
-    util.raiseNotDefined()
+  # def update(self, state, action, nextState, reward):
+  #   """
+	#     This class will call this function, which you write, after
+	#     observing a transition and reward
+  #   """
+  #   util.raiseNotDefined()
 
   ####################################
   #    Read These Functions          #

@@ -6,26 +6,29 @@ import tk as abaloneTk
 import alphaBetaAgent
 import gameState
 import humanAgent
-import RandomAgent
+import randomAgent
+import approximateQAgent
 
 class Agent_repr(object):
-    def __init__(self, type,depth):
+    def __init__(self, type, depth, num_of_training):
         self.agent = None
         if type == 'AlphaBetaAgent':
             self.agent = alphaBetaAgent.AlphaBetaAgent(depth)
         if type == 'KeyboardAgent':
             self.agent = humanAgent.HumanAgent()
         if type == 'RandomAgent':
-            self.agent = RandomAgent.RandomAgent()
+            self.agent = randomAgent.RandomAgent()
+        if type == 'QLearningAgent':
+            self.agent = approximateQAgent.QLearningAgent(numTraining=num_of_training)
 
 
 
 class Game(object):
-    def __init__(self, agent1_type, agent2_type, board_type,depth):
+    def __init__(self, agent1_type, agent2_type, board_type,depth, num_of_training):
         super(Game, self).__init__()
         self.tkState = None
-        self.player1 = Agent_repr(agent1_type,depth)
-        self.player2 = Agent_repr(agent2_type,depth)
+        self.player1 = Agent_repr(agent1_type, depth, num_of_training)
+        self.player2 = Agent_repr(agent2_type, depth, num_of_training)
         self.board = self.create_board(board_type)
         self.depth = depth
         self._state = None

@@ -1,5 +1,5 @@
 import numpy as np
-import Evaluation as eval
+import evaluation as eval
 from abalone import Action, Marble, MarbleManager
 import tk
 
