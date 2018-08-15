@@ -116,10 +116,11 @@ class QLearningAgent(ReinforcementAgent):
 
   def generate_string(self, action, state):
       action_list = list()
-      group = action[0][0]
+      group, direction = action[0]
+
       for marble in group:
           action_list.append((marble['owner'], marble['position']))
-      action_list = str(action_list)
+      action_list = str(action_list) + str(direction)
       state_list = list()
       for marble in state._marbles:
           state_list.append((marble['owner'], marble['position']))
