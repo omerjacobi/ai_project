@@ -103,6 +103,7 @@ class AlphaBetaAgent():
                     score = self.transposition_table[successor_state_string]
                 else:
                     score = min_agent(successor, -agent_index, depth, alpha, beta)
+                    self.transposition_table[successor_state_string] = score
                 if score > best_score:
                     best_score = score
                     best_action = action
@@ -123,17 +124,14 @@ class AlphaBetaAgent():
             best_score = float("inf")
             for action in action_list:
                 successor = game_state.generate_successor(agent_index, action)
+                successor_state_string = successor.create_state_string(agent_index)
                 # finish the depth tree
                 if depth == self.depth - 1:
                     score = self.evaluation_function(successor, -agent_index)
-                    successor_state_string = successor.create_state_string(agent_index)
                     self.transposition_table[successor_state_string] = score
                 # continue to the tree
 
                 else:
-                    successor = game_state.generate_successor(agent_index, action)
-                    successor_state_string = successor.create_state_string(agent_index)
-
                     if self.transposition_table.has_key(successor_state_string):
                         score = self.transposition_table[successor_state_string]
                     else:
