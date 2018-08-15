@@ -67,7 +67,7 @@ class Game(object):
 
                     elapsed = timeit.default_timer() - start_time
 
-                    # print(elapsed)
+                    print(elapsed)
                 if self.board.get_looser():
                     return self.board.get_looser(), turn_counter
                 player_index *= -1
