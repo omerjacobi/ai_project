@@ -158,6 +158,18 @@ class QLearningAgent(ReinforcementAgent):
     """
     return self.getMaxQValueActionPair(state, player_index)[1]
 
+
+  def get_action(self, state, player_index, board):
+      action = self.getPolicy(state, player_index)
+      if isinstance(board, tk.Game_Board):
+          board.move(action[0], True)
+          board.update_idletasks()
+      else:
+          board.move(action[0][0], action[0][1])
+          board.next()
+
+
+
   def getAction(self, state, player_index, board):
     """
       Compute the action to take in the current state.  With
