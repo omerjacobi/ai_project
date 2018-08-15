@@ -250,7 +250,7 @@ class Game_Board(abalone.Game_Board, Tk):
         self.next()
         looser = self.get_looser()
         if looser:
-            print("team "+str(looser)+ " lost the game")
+            # print("team "+str(looser)+ " lost the game")
             self.stop()
             #continue
         else:

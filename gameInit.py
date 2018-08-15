@@ -25,7 +25,7 @@ class GameRunner(object):
         self.current_game = None
 
     def new_game(self, *args, **kw):
-        self.quit_game()
+        # self.quit_game()
         game = gameManager.Game(self._agent1, self._agent2, self.board,self.depth)
         self.current_game = game
         return game.run()
@@ -62,12 +62,26 @@ def main():
         a = 1
         # TODO implement here diffrent start board
     board = args.display
+    num_of_games = args.num_of_games
     # TODO implement diffrent boards kind (display/no display)
     game_runner = GameRunner(board=board, agent1=args.agent1, agent2=args.agent2,depth=args.depth)
-    for i in range(args.num_of_games):
-        score = game_runner.new_game()
+    victories = [0,0]    # index 0 is for BLACK, index 1 is for white
+    game_or_games = " game:" if num_of_games == 1 else " games:"
+    print("\tRunning " + str(num_of_games) + game_or_games)
+    for i in range(num_of_games):
+        loser, turns = game_runner.new_game()
+        winner_str = "Black" if loser == -1 else "White"
+        print("Game #" + str(i + 1) + " ended after " + str(turns) + " turns. Winner: " + winner_str)
+        if loser == -1:
+            victories[0] += 1
+        else:
+            victories[1] += 1
+    if num_of_games > 1:
+        print("\t*** SUMMARY ***")
+        print("Black player won " + str(victories[0]) + " games")
+        print("White player won " + str(victories[1]) + " games")
 
 
 if __name__ == '__main__':
     main()
-    input("Press Enter to continue...")
+    # input("Press Enter to continue...")

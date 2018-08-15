@@ -39,7 +39,7 @@ class Game(object):
             return abaloneTk.Game_Board()
         return None
 
-    def run(self,batch_num=1):
+    def run(self):
         self.board.start(config.Players.Black.positions, config.Players.White.positions)
         initial = self.board.get_initial()
         player_index = 1
@@ -48,8 +48,10 @@ class Game(object):
             state.start(config.Players.Black.positions, config.Players.White.positions)
             state.mainloop()
         else:
-            self.board.update_idletasks()
+            if isinstance(self.board, abaloneTk.Game_Board):
+                self.board.update_idletasks()
             self.board.changed = False
+            turn_counter = 0
             while True:
                 marbles = self.board.get_marbles()
                 state = gameState.GameState(marbles, initial)
@@ -64,5 +66,6 @@ class Game(object):
 
                     print(elapsed)
                 if self.board.get_looser():
-                    break
+                    return self.board.get_looser(), turn_counter
                 player_index *= -1
+                turn_counter += 1
