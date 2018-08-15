@@ -6,18 +6,16 @@
 # John DeNero (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
 # For more info, see http://inst.eecs.berkeley.edu/~cs188/sp09/pacman.html
 
-from learningAgents import ReinforcementAgent
-from featureExtractors import *
 import numpy as np
+
 import abalone
+import alphaBetaAgent
 import config
-import randomAgent
+import evaluation as eval
 import gameState
 import tk
-import evaluation as eval
-import alphaBetaAgent
-
-import random,util,math
+import util
+from learningAgents import ReinforcementAgent
 
 
 def eval_fn(game_state, agent_index):
@@ -93,14 +91,14 @@ class QLearningAgent(ReinforcementAgent):
             if self.agent_index == curr_index:
                 action = self.getAction(state, curr_index, board)
                 new_state = gameState.GameState(board.get_marbles(), initial)
-                self.update(state, action, new_state, eval_fn(new_state, self.agent_index) - eval_fn(state, self.agent_index), self.agent_index)
+                reward = eval_fn(new_state, self.agent_index) - eval_fn(state, self.agent_index)
+                self.update(state, action, new_state, reward, self.agent_index)
                 if board.get_looser():
                     break
             else:
                 enemy.get_action(state, curr_index, board)
                 if board.get_looser():
-                    new_state = gameState.GameState(board.get_marbles(), initial)
-                    self.update(state, action, new_state, eval_fn(new_state, self.agent_index) - eval_fn(state, self.agent_index), self.agent_index)
+
                     break
             curr_index *= -1
           print("Finished Traing number: " + str(i+1))
@@ -125,7 +123,7 @@ class QLearningAgent(ReinforcementAgent):
       state_list = list()
       for marble in state._marbles:
           state_list.append((marble['owner'], marble['position']))
-      state_list = str(state_list)
+      state_list = state.create_state_string(self.agent_index)
       return action_list, state_list
 
   def getMaxQValueActionPair(self, state, player_index):

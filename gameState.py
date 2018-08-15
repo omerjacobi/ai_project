@@ -32,7 +32,7 @@ class GameState(object):
             self._state_string = np.array2string(np.reshape(self.arr_state_rpr, newshape=(81)),
                                                  max_line_width=300)
             self.state_string_need_update = False
-        return self._state_string + str(player_index)
+        return self._state_string.replace(' ','') + str(player_index)
 
     def get_looser(self):
         '''get_looser() -> get the looser team, False if no one.'''

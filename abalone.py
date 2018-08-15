@@ -59,6 +59,8 @@ class Matrix(list):
 
         self.rows = NoNegIndexList(rows)
         self.columns = NoNegIndexList(rows)
+        self.diffs = {0:1, 1:1, 2:0, 3:-1, 4:-1, 5:0}
+
 
         rows = iter(rows)
         for r in ranges:
@@ -204,9 +206,8 @@ class Logic(Matrix):
 
         group -> Group instance.
         direction -> direction of movement, in range(6)'''
-        diffs = 1, 1, 0, -1, -1, 0
-        row_diff = diffs[(direction + 1) % 6]
-        column_diff = diffs[direction]
+        row_diff = self.diffs[(direction + 1) % 6]
+        column_diff = self.diffs[direction]
 
         l = []
         for marble in group:
