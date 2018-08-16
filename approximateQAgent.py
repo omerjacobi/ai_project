@@ -54,8 +54,8 @@ class QLearningAgent(ReinforcementAgent):
         enemy = randomAgent.RandomAgent()
         # enemy = alphaBetaAgent.AlphaBetaAgent(depth=1)
         """enable TK and disable abalone to see training in GUI"""
-        # board = abalone.Game_Board()
-        board = abaloneTk.Game_Board()
+        board = abalone.Game_Board()
+        # board = abaloneTk.Game_Board()
 
         for i in range(self.numTraining):
             board.start(config.Players.Black.positions, config.Players.White.positions)
@@ -67,6 +67,8 @@ class QLearningAgent(ReinforcementAgent):
             num_of_marble_eaten = 0
             state = gameState.GameState(board.get_marbles(), initial)
             reward = 0
+            total_num_eaten = 0
+            total_num_lost = 0
             while True:
                 if isinstance(board, abaloneTk.Game_Board):
                     board.update_idletasks()
@@ -89,19 +91,22 @@ class QLearningAgent(ReinforcementAgent):
                         break
                     if counter > 1:
                         if num_of_marble_eaten > 0:
-                            print ("eaten enemy")
+                            total_num_eaten += 1
                         if num_of_marbles_lost > 0:
-                            print ("lost a marble")
-                        reward +=0 + num_of_marbles_lost * -100 + num_of_marble_eaten * 100
+                            total_num_lost +=1
+                        reward =0 + num_of_marbles_lost * -100 + num_of_marble_eaten * 100
 
                         self.update(state, action, new_state, reward, self.agent_index)
 
                 curr_index *= -1
             if board.get_looser() == self.agent_index:
-                self.update(state, action, new_state, reward - 600, self.agent_index)
+                self.update(state, action, new_state, -600, self.agent_index)
             else:
-                self.update(state, action, new_state, reward + 600, self.agent_index)
+                self.update(state, action, new_state, +600, self.agent_index)
             print("Finished Traing number: " + str(i + 1) + " after " + str(counter) + " plays")
+            print("Number of marble lost: " + str(total_num_lost) + ", Number of marble enemy lost: " + str(
+                total_num_eaten))
+
             print(
             "Training winner is: QLearner" if board.get_looser() != self.agent_index else "Training winner is: enemy")
         print("Finished training!!!!!!!")
