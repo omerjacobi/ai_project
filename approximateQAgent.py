@@ -12,11 +12,12 @@ import alphaBetaAgent
 import config
 import evaluation as eval
 import gameState
-import tk
+import tk as abaloneTk
 import util
 from learningAgents import ReinforcementAgent
 import featureExtractors
-from copy import deepcopy
+import randomAgent
+
 
 
 class QLearningAgent(ReinforcementAgent):
@@ -50,36 +51,57 @@ class QLearningAgent(ReinforcementAgent):
         self.training()
 
     def training(self):
-        # enemy = randomAgent.RandomAgent()
-        enemy = alphaBetaAgent.AlphaBetaAgent(depth=1)
+        enemy = randomAgent.RandomAgent()
+        # enemy = alphaBetaAgent.AlphaBetaAgent(depth=1)
+        """enable TK and disable abalone to see training in GUI"""
+        # board = abalone.Game_Board()
+        board = abaloneTk.Game_Board()
+
         for i in range(self.numTraining):
-            board = abalone.Game_Board()
             board.start(config.Players.Black.positions, config.Players.White.positions)
             initial = board.get_initial()
             self.startEpisode()
             curr_index = 1
+            counter = 0
+            num_of_marbles_lost = 0
+            num_of_marble_eaten = 0
+            state = gameState.GameState(board.get_marbles(), initial)
+            reward = 0
             while True:
-                marbles = deepcopy(board.get_marbles())
-                state = gameState.GameState(marbles, initial)
-                marbles2 = deepcopy(state._marbles)
+                if isinstance(board, abaloneTk.Game_Board):
+                    board.update_idletasks()
+                counter += 1
                 if self.agent_index == curr_index:
+                    state = gameState.GameState(board.get_marbles(), initial)
+                    num_of_marbles_lost = len(state._marbles.get_owner(self.agent_index))
+                    num_of_marble_eaten = len(state._marbles.get_owner(-self.agent_index))
                     action = self.getAction(state, curr_index, board)
-                    marbles3 = deepcopy(state._marbles)
-                    marbles4 = deepcopy(board.get_marbles())
-                    new_state = state.generate_successor(curr_index,action)
-                    marbles5 = new_state._marbles
-                    marbles6 = state._marbles
-                    marbles7 = board.get_marbles()
-                    reward = self.reward_calc(curr_index, new_state=new_state, state=state)
-                    self.update(state, action, new_state, reward, self.agent_index)
                     if board.get_looser():
+                        new_state = gameState.GameState(board.get_marbles(), initial)
                         break
                 else:
-                    enemy.get_action(state, curr_index, board)
+                    e_state = gameState.GameState(board.get_marbles(), initial)
+                    num_of_marble_eaten -= len(e_state._marbles.get_owner(-self.agent_index))
+                    enemy.get_action(e_state, curr_index, board)
+                    new_state = gameState.GameState(board.get_marbles(), initial)
+                    num_of_marbles_lost -= len(new_state._marbles.get_owner(self.agent_index))
                     if board.get_looser():
                         break
+                    if counter > 1:
+                        if num_of_marble_eaten > 0:
+                            print ("eaten enemy")
+                        if num_of_marbles_lost > 0:
+                            print ("lost a marble")
+                        reward +=0 + num_of_marbles_lost * -100 + num_of_marble_eaten * 100
+
+                        self.update(state, action, new_state, reward, self.agent_index)
+
                 curr_index *= -1
-            print("Finished Traing number: " + str(i + 1))
+            if board.get_looser() == self.agent_index:
+                self.update(state, action, new_state, reward - 600, self.agent_index)
+            else:
+                self.update(state, action, new_state, reward + 600, self.agent_index)
+            print("Finished Traing number: " + str(i + 1) + " after " + str(counter) + " plays")
             print(
             "Training winner is: QLearner" if board.get_looser() != self.agent_index else "Training winner is: enemy")
         print("Finished training!!!!!!!")
@@ -87,11 +109,9 @@ class QLearningAgent(ReinforcementAgent):
     def reward_calc(self, curr_index, new_state, state):
         eaten_marble = len(state._marbles.get_owner(-curr_index)) - len(
             new_state._marbles.get_owner(-curr_index))
-        lost_marble = len(state._marbles.get_owner(curr_index)) - len(new_state._marbles.get_owner(
-            curr_index))
-        reward = 1 + eaten_marble*100 + lost_marble*-100
-        if len(new_state._marbles) != 28:
-            print ("check")
+        reward = 1 + eaten_marble*200
+        if reward > 1:
+            print ("eat marble in training")
         return reward
 
     def getQValue(self, state, action, player_index = 0):
@@ -151,7 +171,7 @@ class QLearningAgent(ReinforcementAgent):
 
     def get_action(self, state, player_index, board):
         action = self.getPolicy(state, player_index)
-        if isinstance(board, tk.Game_Board):
+        if isinstance(board, abaloneTk.Game_Board):
             board.move(action[0], True)
             board.update_idletasks()
         else:
@@ -178,7 +198,7 @@ class QLearningAgent(ReinforcementAgent):
                 action = legal_actions[rand_index]
             else:
                 action = self.getPolicy(state, player_index)
-        if isinstance(board, tk.Game_Board):
+        if isinstance(board, abaloneTk.Game_Board):
             board.move(action[0], True)
             board.update_idletasks()
         else:
