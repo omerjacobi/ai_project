@@ -104,6 +104,7 @@ class AlphaBetaAgent():
                 else:
                     score = min_agent(successor, -agent_index, depth, alpha, beta)
                     self.transposition_table[successor_state_string] = score
+                # score = min_agent(successor, -agent_index, depth, alpha, beta)
                 if score > best_score:
                     best_score = score
                     best_action = action
@@ -137,6 +138,7 @@ class AlphaBetaAgent():
                     else:
                         score = max_agent(successor, -agent_index, depth + 1, alpha, beta)
                         self.transposition_table[successor_state_string] = score
+                    # score = max_agent(successor, -agent_index, depth + 1, alpha, beta)
                 best_score = min(score, best_score)
                 beta = min(beta, best_score)
                 if alpha >= beta:
