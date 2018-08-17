@@ -37,8 +37,10 @@ class SimpleExtractor(FeatureExtractor):
     successor = state.generate_successor(player_index, action)
     features["bias"] = 1.0
     features["sumito"] = evaluation.attacking_opponent(successor, player_index)
-    features["op_sumito"] = evaluation.attacked_by_opponent(successor,player_index)
-    features["to_center"] = evaluation.dist_from_center(successor, player_index)/10
+    features["op_sumito"] = -evaluation.attacked_by_opponent(successor,player_index)
+    features["grouping"] = evaluation.own_marbles_grouping(successor, player_index) / 10
+    features["op_grouping"] = -evaluation.opposing_marbles_grouping(successor, player_index) / 10
+    # features["to_center"] = evaluation.dist_from_center(successor, player_index)/10
     # features["marbles"] = evaluation.lost_marbles(successor,player_index)
     # features.divideAll(10)
 

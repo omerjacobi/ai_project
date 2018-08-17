@@ -66,6 +66,7 @@ class QLearningAgent(ReinforcementAgent):
             num_of_marbles_lost = 0
             num_of_marble_eaten = 0
             state = gameState.GameState(board.get_marbles(), initial)
+            new_state = gameState.GameState(board.get_marbles(), initial)
             reward = 0
             total_num_eaten = 0
             total_num_lost = 0
@@ -73,6 +74,47 @@ class QLearningAgent(ReinforcementAgent):
                 if isinstance(board, abaloneTk.Game_Board):
                     board.update_idletasks()
                 counter += 1
+                if self.agent_index == curr_index:
+                    state = gameState.GameState(board.get_marbles(), initial)
+                    num_of_marbles_lost = len(state._marbles.get_owner(self.agent_index))
+                    num_of_marble_eaten = len(state._marbles.get_owner(-self.agent_index))
+                    action = self.getAction(state, curr_index, board)
+                    new_state = gameState.GameState(board.get_marbles(), initial)
+                    num_of_marbles_lost = num_of_marbles_lost - len(new_state._marbles.get_owner(self.agent_index))
+                    num_of_marble_eaten = num_of_marble_eaten - len(new_state._marbles.get_owner(-self.agent_index))
+                    reward = num_of_marble_eaten - num_of_marbles_lost + 100 * eval.win_or_lose(new_state, self.agent_index)
+                    self.update(state, action, new_state, reward, self.agent_index)
+                    if board.get_looser():
+                        # new_state = gameState.GameState(board.get_marbles(), initial)
+                        break
+                    if counter > 1:
+                        if num_of_marble_eaten > 0:
+                            total_num_eaten += 1
+                        if num_of_marbles_lost > 0:
+                            total_num_lost +=1
+                else:
+                    e_state = gameState.GameState(board.get_marbles(), initial)
+                    num_of_marbles_lost = len(e_state._marbles.get_owner(self.agent_index))
+                    num_of_marble_eaten = len(e_state._marbles.get_owner(-self.agent_index))
+                    enemy.get_action(e_state, curr_index, board)
+                    new_e_state = gameState.GameState(board.get_marbles(), initial)
+                    num_of_marbles_lost = num_of_marbles_lost - len(new_e_state._marbles.get_owner(self.agent_index))
+                    num_of_marble_eaten = num_of_marble_eaten - len(new_e_state._marbles.get_owner(-self.agent_index))
+                    reward = num_of_marble_eaten - num_of_marbles_lost + 100 * eval.win_or_lose(new_e_state, self.agent_index)
+                    self.update(state, action, new_state, reward, self.agent_index)
+                    if board.get_looser():
+                        break
+                    if counter > 1:
+                        if num_of_marble_eaten > 0:
+                            total_num_eaten += 1
+                        if num_of_marbles_lost > 0:
+                            total_num_lost +=1
+                        # reward = num_of_marbles_lost * -100 + num_of_marble_eaten * 100
+                        # reward = num_of_marble_eaten - num_of_marbles_lost + eval.win_or_lose(new_state, self.agent_index)
+
+                        # self.update(state, action, new_state, reward, self.agent_index)
+
+                """
                 if self.agent_index == curr_index:
                     state = gameState.GameState(board.get_marbles(), initial)
                     num_of_marbles_lost = len(state._marbles.get_owner(self.agent_index))
@@ -94,16 +136,18 @@ class QLearningAgent(ReinforcementAgent):
                             total_num_eaten += 1
                         if num_of_marbles_lost > 0:
                             total_num_lost +=1
-                        reward =0 + num_of_marbles_lost * -100 + num_of_marble_eaten * 100
+                        # reward = num_of_marbles_lost * -100 + num_of_marble_eaten * 100
+                        reward = num_of_marble_eaten - num_of_marbles_lost + eval.win_or_lose(new_state, self.agent_index)
 
                         self.update(state, action, new_state, reward, self.agent_index)
+                """
 
                 curr_index *= -1
-            if board.get_looser() == self.agent_index:
-                self.update(state, action, new_state, -600, self.agent_index)
-            else:
-                self.update(state, action, new_state, +600, self.agent_index)
-            print("Finished Traing number: " + str(i + 1) + " after " + str(counter) + " plays")
+            # if board.get_looser() == self.agent_index:
+            #     self.update(state, action, new_state, -1, self.agent_index)
+            # else:
+            #     self.update(state, action, new_state, +1, self.agent_index)
+            print("Finished Training number: " + str(i + 1) + " after " + str(counter) + " plays")
             print("Number of marble lost: " + str(total_num_lost) + ", Number of marble enemy lost: " + str(
                 total_num_eaten))
 
@@ -263,14 +307,12 @@ class ApproximateQAgent(AbaloneAgent):
         AbaloneAgent.__init__(self, player_index=player_index, epsilon=epsilon,gamma=gamma,
                                 alpha=alpha, numTraining=numTraining)
         # You might want to initialize weights here.
-        "*** YOUR CODE HERE ***"
 
     def getQValue(self, state, action, player_index = 0):
         """
       Should return Q(state,action) = w * featureVector
       where * is the dotProduct operator
-    """
-        "*** YOUR CODE HERE ***"
+        """
         features = self.featExtractor.getFeatures(state,action,player_index)
         ret_value = 0
         for feature in features:
@@ -280,12 +322,13 @@ class ApproximateQAgent(AbaloneAgent):
     def update(self, state, action, nextState, reward, player_index):
         """
        Should update your weights based on transition
-    """
-        "*** YOUR CODE HERE ***"
+        """
         features = self.featExtractor.getFeatures(state,action,player_index)
         precalc = reward + self.discount * self.getValue(nextState,player_index) - self.getQValue(state, action)
         for feature in features:
             self.weight[feature] += self.alpha * precalc * features[feature]
+        # string = self.generate_string(action, state)
+        # self.q_values[string] = precalc
 
     def final(self, state):
         "Called at the end of each game."
@@ -295,5 +338,4 @@ class ApproximateQAgent(AbaloneAgent):
         # did we finish training?
         if self.episodesSoFar == self.numTraining:
             # you might want to print your weights here for debugging
-            "*** YOUR CODE HERE ***"
             pass
