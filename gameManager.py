@@ -19,7 +19,7 @@ class Agent_repr(object):
         if type == 'RandomAgent':
             self.agent = randomAgent.RandomAgent()
         if type == 'QLearningAgent':
-            self.agent = approximateQAgent.ApproximateQAgent(player_index, numTraining=num_of_training)
+            self.agent = approximateQAgent.QLearningReplayMemory(player_index=player_index, num_training=num_of_training)
 
 
 

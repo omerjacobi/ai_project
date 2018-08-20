@@ -3,7 +3,7 @@ import numpy as np
 from abalone import Group, Logic, Action, Marble, MarbleManager
 import multiprocessing
 import numpy
-
+import json
 BLACK = 1
 WHITE = -1
 
@@ -11,8 +11,38 @@ def unwrap_self_g(arg, **kwarg):
     return GameState.get_all_moves2(*arg, **kwarg)
 
 
+def json_load_byteified(file_handle):
+    return _byteify(
+        json.load(file_handle, object_hook=_byteify),
+        ignore_dicts=True
+    )
+
+def json_loads_byteified(json_text):
+    return _byteify(
+        json.loads(json_text, object_hook=_byteify),
+        ignore_dicts=True
+    )
+
+def _byteify(data, ignore_dicts = False):
+    # if this is a unicode string, return its string representation
+    if isinstance(data, unicode):
+        return data.encode('utf-8')
+    # if this is a list of values, return list of byteified values
+    if isinstance(data, list):
+        return [ _byteify(item, ignore_dicts=True) for item in data ]
+    # if this is a dictionary, return dictionary of byteified keys and values
+    # but only if we haven't already byteified it
+    if isinstance(data, dict) and not ignore_dicts:
+        return {
+            _byteify(key, ignore_dicts=True): _byteify(value, ignore_dicts=True)
+            for key, value in data.iteritems()
+        }
+    # if it's anything else, return it in its original form
+    return data
+
+
 class GameState(object):
-    def __init__(self, marbles, initial_length):
+    def __init__(self, marbles, initial_length=(14,14)):
         self._marbles = MarbleManager(marbles)
         self._logic = Logic()
         self.initial = initial_length
@@ -21,18 +51,12 @@ class GameState(object):
         self.player_how_lost_marble = 0
         self.state_string_need_update = True
 
-    def create_state_string(self, player_index):
+    def create_state_string(self):
         if self.state_string_need_update:
-            for marble in self._marbles:
-                if (marble['owner'] == 1):
-                    self.arr_state_rpr[marble['position'][0] - 1][marble['position'][1] - 1] = 1
-                else:
-                    self.arr_state_rpr[marble['position'][0] - 1][marble['position'][1] - 1] = 2
-
-            self._state_string = np.array2string(np.reshape(self.arr_state_rpr, newshape=(81)),
-                                                 max_line_width=300)
+            sorted_marble = sorted(self._marbles, key=lambda marble: marble['position'])
+            self._state_string = json.dumps(sorted_marble)
             self.state_string_need_update = False
-        return self._state_string.replace(' ','') + str(player_index)
+        return self._state_string
 
     def get_looser(self):
         '''get_looser() -> get the looser team, False if no one.'''
