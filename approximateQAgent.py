@@ -70,8 +70,8 @@ class QLearningReplayMemory(RLAgent):
         self.training()
 
     def training(self):
-        enemy = randomAgent.RandomAgent()
-        # enemy = alphaBetaAgent.AlphaBetaAgent(depth=1)
+        # enemy = randomAgent.RandomAgent()
+        enemy = alphaBetaAgent.AlphaBetaAgent(depth=1)
         """enable TK and disable abalone to see training in GUI"""
         board = abalone.Game_Board()
         # board = abaloneTk.Game_Board()
