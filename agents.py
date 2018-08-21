@@ -3,13 +3,11 @@ File for breakout-playing agents
 
 """
 import abc
-from constants import *
 from collections import defaultdict
 import re
 import math
 import random
 import util
-import tensorflow as tf
 import string
 # from function_approximators import *
 import random
@@ -19,7 +17,7 @@ from eligibility_tracer import EligibilityTrace
 import numpy as np
 import tk as abaloneTk
 
-DEF_GAMMA = 0.990
+DEF_GAMMA = 0.993
 
 DEF_EPSILON = 0.2
 

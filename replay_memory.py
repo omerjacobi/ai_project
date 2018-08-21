@@ -1,5 +1,4 @@
 import random
-import constants
 DEFAULT_REPLAY_CAPACITY = 10000
 
 class ReplayMemory(object):

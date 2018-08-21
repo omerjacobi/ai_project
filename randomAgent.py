@@ -22,10 +22,11 @@ class RandomAgent():
         if len(legal_moves) == 0:
             return Action.STOP
         index = random.randint(0, len(legal_moves) - 1)
-        if isinstance(board, tk.Game_Board):
-            board.move(legal_moves[index][0], True)
-            board.update_idletasks()
-        else:
-            board.move(legal_moves[index][0][0], legal_moves[index][0][1])
-            board.next()
+        # if isinstance(board, tk.Game_Board):
+        #     board.move(legal_moves[index][0], True)
+        #     board.update_idletasks()
+        # else:
+        #TODO restore
+        board.move(legal_moves[index][0][0], legal_moves[index][0][1])
+        board.next()
         return legal_moves[index][0]

@@ -147,12 +147,13 @@ class AlphaBetaAgent():
 
         game_state = self.marble_list_creator(game_state)
         a = max_agent(game_state, agent_index, 0, float("-inf"), float("inf"))
-        if isinstance(board, tk.Game_Board):
-            board.move(a[0], True)
-            board.update_idletasks()
-        else:
-            board.move(a[0][0], a[0][1])
-            board.next()
+        # if isinstance(board, tk.Game_Board):
+        #     board.move(a[0], True)
+        #     board.update_idletasks()
+        # else:
+        #TODO : restore
+        board.move(a[0][0], a[0][1])
+        board.next()
         return a[0]
 
     def marble_list_creator(self, state):

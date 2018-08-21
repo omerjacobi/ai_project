@@ -505,7 +505,6 @@ import math
 from collections import defaultdict
 import copy
 import numpy as np
-import constants
 
 def dotProduct(a, b):
     """ dot product of two vectors """
@@ -550,17 +549,7 @@ def combine(c, x1, d, x2):
                 raise Exception
     return out
 
-def discretizeLocation(x, y):
-    """converts continuous coordinates in R^2 to discrete location measurement
 
-    does so by converting game board to grid of 10x10 pixel squares, then
-      gives the index of the square that (x, y) is in
-    """
-    row_delta = constants.SCREEN_SIZE[0] / 10
-    col_delta = constants.SCREEN_SIZE[1] / 10
-    x_grid = x / row_delta
-    y_grid = y / col_delta
-    return x_grid + y_grid * 10
 
 def discretizeAngle(vec):
     """buckets the continuous angle of a vector into one of 16 discrete angle categories

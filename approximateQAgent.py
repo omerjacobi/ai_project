@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+
+
 # qlearningAgents.py
 # ------------------
 # Licensing Information: Please do not distribute or publish solutions to this
@@ -57,8 +60,9 @@ class QLearningReplayMemory(RLAgent):
     """Implementation of Q-learing with replay memory, which updates model parameters
         towards a random sample of past experiences
     """
-    def __init__(self, epsilon=0.5, gamma=0.993, stepSize=None,
-        num_static_target_steps=750, memory_size=2500, replay_sample_size=4, player_index = 0, num_training = 1):
+    def __init__(self, epsilon=0.2, gamma=0.993, stepSize=None,
+        num_static_target_steps=750, memory_size=5000, replay_sample_size=4, player_index = 0,
+                 num_training = 1):
         super(QLearningReplayMemory, self).__init__(fe.SimpleExtractor(), epsilon, gamma, stepSize)
         self.num_static_target_steps = num_static_target_steps
         self.memory_size = memory_size
@@ -90,8 +94,9 @@ class QLearningReplayMemory(RLAgent):
             total_num_lost = 0
             new_state = None
             while True:
-                if isinstance(board, abaloneTk.Game_Board):
-                    board.update_idletasks()
+                # if isinstance(board, abaloneTk.Game_Board):
+                #     board.update_idletasks()
+                #TODO restore
                 counter += 1
                 if self.agent_index == curr_index:
                     state = gameState.GameState(board.get_marbles(), initial)
@@ -189,15 +194,11 @@ class QLearningReplayMemory(RLAgent):
         # update the auxiliary weights to the current weights every num_static_target_steps iterations
         if self.numIters % self.num_static_target_steps == 0:
             self.update_static_target()
-        if reward == 1:
-            a=1
         self.replay_memory.store(self.generate_string(state, player_index,action, reward, newState))
 
         for i in range(self.sample_size if self.replay_memory.isFull() else 1):
             state,player_index, action, reward, newState = self.replay_memory.sample()
             state, player_index, action, reward, newState = self.load_string(state, player_index,action, reward, newState)
-            if reward != 0:
-                a = 1
             prediction = self.getQ(state, action, player_index)
             target = reward
             if not newState.get_looser():
@@ -209,8 +210,6 @@ class QLearningReplayMemory(RLAgent):
             # clip gradient - TODO EXPORT TO UTILS?
             # update = max(-2, update) if update < 0 else min(2, update)
             if update != 0:
-                if reward != 0:
-                    a=1
                 iter_dic = self.fe.getFeatures(state,action,player_index)
                 dic_sum = iter_dic.totalCount()
                 if dic_sum != 0: #TODO: check
@@ -218,4 +217,3 @@ class QLearningReplayMemory(RLAgent):
                         if v != 0:
                             self.weights[f] = self.weights[f] - (update / dic_sum)
         return None
-
