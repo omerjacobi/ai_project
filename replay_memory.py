@@ -33,7 +33,7 @@ class ReplayMemory(object):
             The memory is biased against throwing away SARS' tuples with
             nonzero reward. This helps the agent hold on to its most informative records
         """
-        bias = 0.998
+        bias = 0.997
 
         while True:
             del_index = random.randint(self.start_i, self.end_i)

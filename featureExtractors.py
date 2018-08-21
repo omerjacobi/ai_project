@@ -9,7 +9,7 @@
 "Feature extractors for Pacman game states"
 import util
 import evaluation
-
+from abalone import Marble, Action
 
 class FeatureExtractor:  
   def getFeatures(self, state, action, player_index):
@@ -36,14 +36,13 @@ class SimpleExtractor(FeatureExtractor):
     features = util.Counter()
     successor = state.generate_successor(player_index, action)
     features["bias"] = 1.0
-    features["sumito"] = evaluation.attacking_opponent(successor, player_index)
-    features["op_sumito"] = -evaluation.attacked_by_opponent(successor,player_index)
-    features["grouping"] = evaluation.own_marbles_grouping(successor, player_index) / 10
-    features["op_grouping"] = -evaluation.opposing_marbles_grouping(successor, player_index) / 10
-    # features["to_center"] = evaluation.dist_from_center(successor, player_index)/10
+    features["sumito"] = evaluation.attacking_opponent(successor, player_index) - evaluation.attacking_opponent(state, player_index)
+    features["op_sumito"] = evaluation.attacked_by_opponent(successor,player_index) - evaluation.attacked_by_opponent(state,player_index)
+    features["grouping"] = evaluation.own_marbles_grouping(successor, player_index) - evaluation.own_marbles_grouping(state, player_index)
+    features["op_grouping"] = evaluation.opposing_marbles_grouping(successor, player_index) - evaluation.opposing_marbles_grouping(state, player_index)
+    features["to_center"] = evaluation.dist_from_center(successor, player_index) - evaluation.dist_from_center(state, player_index)
     # features["marbles"] = evaluation.lost_marbles(successor,player_index)
-    # features.divideAll(10)
-
+    features.normalize()
 
     
 

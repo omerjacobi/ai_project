@@ -73,7 +73,7 @@ class Marble(dict):
     keys that represents an abalone's marble.'''
 
     def __init__(self, position, owner):
-        self['position'] = position
+        self['position'] = [position[0],position[1]]
         self['owner'] = owner
 
     def __hash__(self):
@@ -215,7 +215,7 @@ class Logic(Matrix):
             col = marble['position'][1] + column_diff
             if row > 0 and row < 10 and col > 0 and col < 10:
                 if (row, col) in self:
-                    l.append(Marble((row, col), marble['owner']))
+                    l.append(Marble([row, col], marble['owner']))
                     # try:
                     #     row = self.rows[self.rows.index(marble['position'][0]) + row_diff]
                     #     column = self.columns[self.columns.index(marble['position'][1]) + column_diff]

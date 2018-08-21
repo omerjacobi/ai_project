@@ -55,7 +55,7 @@ def dist_from_center(state, agent_index):
     """
     res = 0
     for marble in state._marbles.get_owner(agent_index):
-        res += distances_from_center[marble['position']]
+        res += distances_from_center[tuple(marble['position'])]
     return res
 
 
@@ -63,12 +63,12 @@ def potential_neighbors(position):
     """
     Returns a list of potential neighbors at a given position
     """
-    res = [(position[0] - 1, position[1] - 1),
-           (position[0], position[1] - 1),
-           (position[0] + 1, position[1]),
-           (position[0] + 1, position[1] + 1),
-           (position[0], position[1] + 1),
-           (position[0] - 1, position[1])]
+    res = [[position[0] - 1, position[1] - 1],
+           [position[0], position[1] - 1],
+           [position[0] + 1, position[1]],
+           [position[0] + 1, position[1] + 1],
+           [position[0], position[1] + 1],
+           [position[0] - 1, position[1]]]
     return filter(position_in_range, res)
 
 
@@ -100,7 +100,7 @@ def count_row_sequence(marbles_group_positions, start_pos, direction):
     """
     res = 1
     for i in range(1, 3):
-        if (start_pos[0] + i * direction[0], start_pos[1] + i * direction[1]) in marbles_group_positions:
+        if [start_pos[0] + i * direction[0], start_pos[1] + i * direction[1]] in marbles_group_positions:
             res += 1
         else:
             break
@@ -111,15 +111,17 @@ def has_numerical_advantage(agent_marbles_positions, agent_pos, opponent_marbles
     """
     Returns True iff a there's a row sequence advantage of up to 3 marbles to agent over it's opponent in a certain row
     """
-    return count_row_sequence(agent_marbles_positions, agent_pos, (-direction[0], -direction[1])) > count_row_sequence(opponent_marbles_positions, opponent_pos, direction)
+    return count_row_sequence(agent_marbles_positions, agent_pos, [-direction[0], -direction[1]]) > count_row_sequence(opponent_marbles_positions, opponent_pos, direction)
 
 
 def has_free_zone_for_sumito(opponent_pos, direction, opponent_marbles_positions, agent_marbles_positions):
     """
     Returns True iff there is a valid space for a Sumito move ('pushing' opponent's marbles)
     """
-    sumito_pos = (opponent_pos[0] + direction[0] * (count_row_sequence(opponent_marbles_positions, opponent_pos ,direction)),
-                  opponent_pos[1] + direction[1] * (count_row_sequence(opponent_marbles_positions, opponent_pos ,direction)))
+    sumito_pos = [opponent_pos[0] + direction[0] * (count_row_sequence(opponent_marbles_positions, opponent_pos ,
+                                                                       direction)),
+                  opponent_pos[1] + direction[1] * (count_row_sequence(opponent_marbles_positions, opponent_pos ,
+                                                                       direction))]
     return (not position_in_range(sumito_pos)) or (sumito_pos not in opponent_marbles_positions and sumito_pos not in agent_marbles_positions)
 
 
@@ -133,27 +135,27 @@ def attacking_opponent(state, agent_index):
     agent_marbles_positions = map(lambda m: m['position'], agent_marbles)
     opponent_marbles_positions = map(lambda m: m['position'], opponent_marbles)
     for pos in agent_marbles_positions:
-        if (pos[0], pos[1] + 1) in opponent_marbles_positions:
+        if [pos[0], pos[1] + 1] in opponent_marbles_positions:
             if has_numerical_advantage(agent_marbles_positions, pos, opponent_marbles_positions, (pos[0], pos[1] + 1), (0,1)) \
                     and has_free_zone_for_sumito((pos[0], pos[1] + 1), (0,1), opponent_marbles_positions, agent_marbles_positions):
                 res += 1
-        if (pos[0], pos[1] - 1) in opponent_marbles_positions:
+        if [pos[0], pos[1] - 1] in opponent_marbles_positions:
             if has_numerical_advantage(agent_marbles_positions, pos, opponent_marbles_positions, (pos[0], pos[1] - 1), (0,-1)) \
                     and has_free_zone_for_sumito((pos[0], pos[1] - 1), (0,-1), opponent_marbles_positions, agent_marbles_positions):
                 res += 1
-        if (pos[0] + 1, pos[1] + 1) in opponent_marbles_positions:
+        if [pos[0] + 1, pos[1] + 1] in opponent_marbles_positions:
             if has_numerical_advantage(agent_marbles_positions, pos, opponent_marbles_positions, (pos[0] + 1, pos[1] + 1), (1,1)) \
                     and has_free_zone_for_sumito((pos[0] + 1, pos[1] + 1), (1,1), opponent_marbles_positions, agent_marbles_positions):
                 res += 1
-        if (pos[0] + 1, pos[1]) in opponent_marbles_positions:
+        if [pos[0] + 1, pos[1]] in opponent_marbles_positions:
             if has_numerical_advantage(agent_marbles_positions, pos, opponent_marbles_positions, (pos[0] + 1, pos[1]), (1,0)) \
                     and has_free_zone_for_sumito((pos[0] + 1, pos[1]), (1,0), opponent_marbles_positions, agent_marbles_positions):
                 res += 1
-        if (pos[0] - 1, pos[1] - 1) in opponent_marbles_positions:
+        if [pos[0] - 1, pos[1] - 1] in opponent_marbles_positions:
             if has_numerical_advantage(agent_marbles_positions, pos, opponent_marbles_positions, (pos[0] - 1, pos[1] - 1), (-1,-1)) \
                     and has_free_zone_for_sumito((pos[0] - 1, pos[1] - 1), (-1,-1), opponent_marbles_positions, agent_marbles_positions):
                 res += 1
-        if (pos[0] - 1, pos[1]) in opponent_marbles_positions:
+        if [pos[0] - 1, pos[1]] in opponent_marbles_positions:
             if has_numerical_advantage(agent_marbles_positions, pos, opponent_marbles_positions, (pos[0] - 1, pos[1]), (-1,0)) \
                     and has_free_zone_for_sumito((pos[0] - 1, pos[1]), (-1,0), opponent_marbles_positions, agent_marbles_positions):
                 res += 1

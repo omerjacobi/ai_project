@@ -46,8 +46,6 @@ class GameState(object):
         self._marbles = MarbleManager(marbles)
         self._logic = Logic()
         self.initial = initial_length
-        self.arr_state_rpr = numpy.zeros(shape=(9, 9), dtype=np.int64)  # todo to make sure if this process is
-        # needed or can be spare
         self.player_how_lost_marble = 0
         self.state_string_need_update = True
 
@@ -165,7 +163,7 @@ class GameState(object):
         self.state_string_need_update = True
         self.is_terminal = True if looser else False
 
-    def generate_successor(self, agent_index=1, action=Action.STOP):
+    def generate_successor(self, agent_index=0, action=Action.STOP):
         # new_marbles = MarbleManager([Marble(marble['position'],marble['owner']) for marble in \
         #         self._marbles])
         successor = GameState(self._marbles, self.initial)

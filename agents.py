@@ -19,6 +19,10 @@ from eligibility_tracer import EligibilityTrace
 import numpy as np
 import tk as abaloneTk
 
+DEF_GAMMA = 0.990
+
+DEF_EPSILON = 0.2
+
 GRADIENT = 5
 
 
@@ -67,7 +71,7 @@ class BaseAgent(object):
 class RLAgent(BaseAgent):
     """base class for RL agents that approximate the value function.
     """
-    def __init__(self, featureExtractor, epsilon=0.5, gamma=0.993, stepSize=None):
+    def __init__(self, featureExtractor, epsilon=DEF_EPSILON, gamma=DEF_GAMMA, stepSize=None):
         self.fe = featureExtractor
         self.explorationProb = epsilon
         self.discount = gamma
@@ -88,7 +92,7 @@ class RLAgent(BaseAgent):
         score = 0
         for f, v in features.items():
             score += self.weights[f] * v
-        return score
+        return min(max(score,-1),1)
 
     def takeAction(self, game_state_tuple):
         """ returns action according to e-greedy policy

@@ -70,8 +70,8 @@ class QLearningReplayMemory(RLAgent):
         self.training()
 
     def training(self):
-        # enemy = randomAgent.RandomAgent()
-        enemy = alphaBetaAgent.AlphaBetaAgent(depth=1)
+        enemy = randomAgent.RandomAgent()
+        # enemy = alphaBetaAgent.AlphaBetaAgent(depth=1)
         """enable TK and disable abalone to see training in GUI"""
         board = abalone.Game_Board()
         # board = abaloneTk.Game_Board()
@@ -88,6 +88,7 @@ class QLearningReplayMemory(RLAgent):
             reward = 0
             total_num_eaten = 0
             total_num_lost = 0
+            new_state = None
             while True:
                 if isinstance(board, abaloneTk.Game_Board):
                     board.update_idletasks()
@@ -97,15 +98,17 @@ class QLearningReplayMemory(RLAgent):
                     num_of_marbles_lost = len(state._marbles.get_owner(self.agent_index))
                     num_of_marble_eaten = len(state._marbles.get_owner(-self.agent_index))
                     action = self.takeAction((state, curr_index, board))
+                    new_state = gameState.GameState(board.get_marbles(), initial)
                     if board.get_looser():
                         new_state = gameState.GameState(board.get_marbles(), initial)
                         break
                 else:
-                    e_state = gameState.GameState(board.get_marbles(), initial)
-                    num_of_marble_eaten -= len(e_state._marbles.get_owner(-self.agent_index))
-                    enemy.get_action(e_state, curr_index, board)
-                    new_state = gameState.GameState(board.get_marbles(), initial)
-                    num_of_marbles_lost -= len(new_state._marbles.get_owner(self.agent_index))
+                    if new_state is None:
+                        new_state = gameState.GameState(board.get_marbles(), initial)
+                    num_of_marble_eaten -= len(new_state._marbles.get_owner(-self.agent_index))
+                    enemy.get_action(new_state, curr_index, board)
+                    e_new_state = gameState.GameState(board.get_marbles(), initial)
+                    num_of_marbles_lost -= len(e_new_state._marbles.get_owner(self.agent_index))
                     if board.get_looser():
                         break
                     if counter > 1:
@@ -116,7 +119,7 @@ class QLearningReplayMemory(RLAgent):
                         # reward = num_of_marbles_lost * -100 + num_of_marble_eaten * 100
                         reward = num_of_marble_eaten - num_of_marbles_lost
 
-                        self.incorporateFeedback(state, action, reward, new_state, curr_index)
+                        self.incorporateFeedback(state, action, reward, new_state, self.agent_index)
 
                 curr_index *= -1
             if board.get_looser() == self.agent_index:
@@ -151,7 +154,7 @@ class QLearningReplayMemory(RLAgent):
         score = 0
         for f, v in features.items():
             score += self.static_target_weights[f] * v
-        return score
+        return min(max(score,-1),1)
 
 
     def update_static_target(self):
@@ -186,23 +189,33 @@ class QLearningReplayMemory(RLAgent):
         # update the auxiliary weights to the current weights every num_static_target_steps iterations
         if self.numIters % self.num_static_target_steps == 0:
             self.update_static_target()
-
+        if reward == 1:
+            a=1
         self.replay_memory.store(self.generate_string(state, player_index,action, reward, newState))
 
         for i in range(self.sample_size if self.replay_memory.isFull() else 1):
             state,player_index, action, reward, newState = self.replay_memory.sample()
             state, player_index, action, reward, newState = self.load_string(state, player_index,action, reward, newState)
+            if reward != 0:
+                a = 1
             prediction = self.getQ(state, action, player_index)
             target = reward
-            if newState.get_looser():
+            if not newState.get_looser():
                 # Use the static auxiliary weights as your target
                 target += self.discount * max(self.getStaticQ(newState, newAction, player_index) for newAction in self.actions(
                     newState, player_index))
 
-            update = 1 * (prediction - target)
+            update = target - prediction
             # clip gradient - TODO EXPORT TO UTILS?
-            update = max(-5, update) if update < 0 else min(5, update)
-            for f, v in self.fe.getFeatures(state,action,player_index).iteritems():
-                self.weights[f] = self.weights[f] - update * v
+            # update = max(-2, update) if update < 0 else min(2, update)
+            if update != 0:
+                if reward != 0:
+                    a=1
+                iter_dic = self.fe.getFeatures(state,action,player_index)
+                dic_sum = iter_dic.totalCount()
+                if dic_sum != 0: #TODO: check
+                    for f, v in iter_dic.iteritems():
+                        if v != 0:
+                            self.weights[f] = self.weights[f] - (update / dic_sum)
         return None
 
