@@ -339,11 +339,13 @@ Our Approach
 
 \begin_layout Standard
 This section describes the techniques and algorithms used in our research
- in order answer all of the above questions.
+ in order answer all of the above questions, we implemented the Alpha-Beta
+ algorithm and a deep Q-learning agent and tried to compare them and improve
+ them.
 \end_layout
 
 \begin_layout Subsection
-Alpha-Beta 
+Alpha-Beta Improvements 
 \end_layout
 
 \begin_layout Standard
@@ -358,21 +360,20 @@ One of the reasons we decided to implement Alpha-Beta algorithm is that
  we also decided to try these several methods of improvements: Multiprocessing
  with Alpha-Beta , Minimal window search, move ordering and transportation
  table.
- 
 \end_layout
 
 \begin_layout Subsubsection
-Multiprocessing with Alpha-Beta:
+Multiprocessing with Alpha-Beta
 \end_layout
 
 \begin_layout Standard
 We wanted to use in our favor one of the biggest improvements we had in
- last several years in terms of processors -which is multiprocessing, we
+ last several years in terms of processors which is multiprocessing, we
  started to explore which way is the best to combine our multiprocessing
  power in our program, we thought about combining our multi-cores in the
  actual alpha-beta search, but it turned out to be very difficult and complex
  to do alpha beta search in parallel , there are a lot of dependencies between
- all of the processors -making it very hard to co-work all together.
+ all of the processors making it very hard to co-work all together.
  We examined the results of our program and noticed that one of the most
  consuming things we done is state generation - in order to generate a proper
  game state in abalone we had to supply all N possible actions from state
@@ -393,7 +394,159 @@ We wanted to use in our favor one of the biggest improvements we had in
  we sent each processor a chunk of combinations of marbles and got back
  in return only the valid groups they found (each processor run the desired
  methods in order to check if the current group is valid).
- Unfortunately 
+ Unfortunately the results were bad , and didn't came close to improve our
+ running time by 4X (we used four cores rather than one).
+ one of the complications about that were using Python for our project,
+ which is very inefficient with running multiple threads and process.
+ 
+\end_layout
+
+\begin_layout Subsubsection
+Move ordering
+\end_layout
+
+\begin_layout Standard
+We concluded from our knowledge of Alpha-Beta algorithm that it may spare
+ a lot of time , but it can also be ineffective - it depends of the order
+ of the nodes that are being examined in the algorithm, Therefore, the search
+ algorithm should consider the most promising moves first to maximize the
+ chance of tree branches being pruned ,In Abalone the strongest moves are
+ those that attack the opponent or those that keep marbles together in a
+ group for a better defense.
+ Therefore, moves consisting of several marbles are often more valuable.
+ So we investigated first moves consisting of 3 marbles.
+ Then the moves containing two marbles follow and moves containing only
+ a single marble are investigated last.
+ The calculation time decreases dramatically as will be shown in experiments
+ section below.
+\end_layout
+
+\begin_layout Subsubsection
+Transportation table
+\end_layout
+
+\begin_layout Standard
+We noticed that Abalone is a game which is very repetitive in terms of game
+ tree and states representation, as we reminded above, one of difference
+ of Abalone from Chess is the fact that the marbles are all of the same,
+ therefore, each state can be caused from several different series of actions
+ , and this is where transportation table comes handy,our transportation
+ table is hash table, which maps between a string representation of a state
+ to it’s score, so if we came across a particular state before, we could
+ check it's score in O(1) , instead of rechecking this specific state (and
+ possibly it's child nodes) all over again, we spare that time using the
+ transportation table,as will be presented below in the experiments section.
+\end_layout
+
+\begin_layout Subsection
+Evaluation function 
+\end_layout
+
+\begin_layout Standard
+In addition to focusing on improving Alpha-Beta in general we focused at
+ finding good heuristics for our Abalone game, we know that a good heuristic
+ means efficient exploration of the game tree, meaning improvement of running
+ time and performance.
+\begin_inset Newline newline
+\end_inset
+
+The use of heuristics is useless if we search the whole tree - if we go
+ thorough all of the tree, it means we reached all of the final states in
+ our game, meaning we know , what actions can lead us to a winning leaf
+ or a losing leaf.
+ Heuristic comes in handy once we have high branching factor (i.e Abalone)
+ and we can't explore all of the game tree and we can only reach to certain
+ depth and we want to estimate this state, define it as good or bad, or
+ even give it a numeric score, for doing that we need to find some features
+ representing the value of specific state.
+ one of the demands of a good evaluation function is to be fast and accurate
+ in assessing a given game position.
+ in our research we focused on some specific features (and their combinations)
+ in order to find the best evaluation function there is.
+\end_layout
+
+\begin_layout Subsubsection
+Defensive positions
+\end_layout
+
+\begin_layout Standard
+While playing the game we noticed that if our marbles are spread in the
+ board it is more probable that they will be attacked by the opponent, therefore
+, we assumed that if our marbles will be grouped together they are less
+ probable to be pushed (attacked) and if they will be in the center of the
+ board we will also be less exposed to situations of losing our marbles
+ (in order to loss marble it got to be close to the borders of the board).
+ also by being in a 
+\begin_inset Quotes eld
+\end_inset
+
+Defensive position
+\begin_inset Quotes erd
+\end_inset
+
+ we can prevent the opponent being there himself, the opponent will have
+ hard time grouping together if we will control the center of the board.
+\end_layout
+
+\begin_layout Subsubsection
+Attacking and attacked (Sumito positions)
+\end_layout
+
+\begin_layout Standard
+A Sumito move is a move where some opponent’s marbles are pushed by moving
+ some of the player’s own marbles.
+ A Sumito situation is reached in case that there is a row of marbles where
+ on one side there are only black marbles and on 8 the other side there
+ are white marbles.
+ Between the marbles there must not be a gap.
+ If the number of marbles of one player exceeds the number of the other
+ player’s marbles he is in a Sumito situation.
+ We tried to value a state according to the difference between the the Sumito
+ situation we got and the Sumito situation our opponent have.
+ We seek to reach to situations in which we have as much as Sumito situations
+ as we can and meanwhile as less as we can to our opponent , the rational
+ behind that is that we will be able to control the location of the opponent
+ marbles (and maybe even control the number of marbles he got) and still
+ minimize the number of times he will be able to affect our moves (if he
+ has low Sumito situations it means he can't push as, and of course - winning
+ us).
+\end_layout
+
+\begin_layout Subsubsection
+Lost marbles 
+\end_layout
+
+\begin_layout Standard
+We know that according to the game rules - the first player that manages
+ to push 6 marbles of the other player is the winner of the game , therefore
+ we need to evaluate a state by the difference between the opponent lost
+ marbles and our lost marbles.
+ if we pursue states in which we got more marbles than the opponent , we
+ probably rise or probability of becoming the winners.
+ Furthermore, ejecting an opposing marble weakens the position of the opponent
+ while it strengthens the own position, because the more marbles one has
+ the better one can attack and defend.
+\end_layout
+
+\begin_layout Subsubsection
+Win or loss
+\end_layout
+
+\begin_layout Standard
+We want to give a excessively good score to states that represent victory
+ to us ( states in which the opponent has only 8 marbles while we got more
+ than 8) therefore we also calculated and scored states according to their
+ winning
+\backslash
+losing 
+\begin_inset Quotes eld
+\end_inset
+
+feature
+\begin_inset Quotes erd
+\end_inset
+
+.
 \end_layout
 
 \end_body
