@@ -393,7 +393,48 @@ We wanted to use in our favor one of the biggest improvements we had in
  we sent each processor a chunk of combinations of marbles and got back
  in return only the valid groups they found (each processor run the desired
  methods in order to check if the current group is valid).
- Unfortunately 
+ Unfortunately the results were bad , and didn’t came close to improve our
+ running time by 4X (we used four cores rather than one).
+ one of the complications about that were using Python for our project,
+ which is very inefficient with running multiple threads and process.
+ 
+\end_layout
+
+\begin_layout Subsubsection
+Move ordering: 
+\end_layout
+
+\begin_layout Standard
+We concluded from our knowledge of Alpha-Beta algorithm that it may spare
+ a lot of time , but it can also be uneffective - it depends of the order
+ of the nodes that are being examined in the algorithm, Therefore, the search
+ algorithm should consider the most promising moves first to maximize the
+ chance of tree branches being pruned ,In Abalone the strongest moves are
+ those that attack the opponent or those that keep marbles together in a
+ group for a better defense.
+ Therefore, moves consisting of several marbles are often more valuable.
+ So we investigated first moves consisting of 3 marbles.
+ Then the moves containing two marbles follow and moves containing only
+ a single marble are investigated last.
+ The calculation time decreases dramatically as will be shown in experiments
+ section below.
+\end_layout
+
+\begin_layout Subsubsection
+transportation table: 
+\end_layout
+
+\begin_layout Standard
+We noticed that Abalone is a game which is very repetitive in terms of game
+ tree and states representation, as we reminded above, one of difference
+ of Abalone from Chess is the fact that the marbles are all of the same,
+ therefore, each state can be caused from several different series of actions
+ , and this is where transportation table comes handy,our transportation
+ table is hash table, which maps between a string representation of a state
+ to it’s score, so if we came across a particular state before, we could
+ check it's score in O(1) , instead of rechecking this specific state (and
+ possibly it's child nodes) all over again, we spare that time using the
+ transportation table.
 \end_layout
 
 \end_body
