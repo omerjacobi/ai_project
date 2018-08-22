@@ -4,8 +4,10 @@ from abalone import Group, Logic, Action, Marble, MarbleManager
 import multiprocessing
 import numpy
 import json
+
 BLACK = 1
 WHITE = -1
+
 
 def unwrap_self_g(arg, **kwarg):
     return GameState.get_all_moves2(*arg, **kwarg)
@@ -17,19 +19,21 @@ def json_load_byteified(file_handle):
         ignore_dicts=True
     )
 
+
 def json_loads_byteified(json_text):
     return _byteify(
         json.loads(json_text, object_hook=_byteify),
         ignore_dicts=True
     )
 
-def _byteify(data, ignore_dicts = False):
+
+def _byteify(data, ignore_dicts=False):
     # if this is a unicode string, return its string representation
     if isinstance(data, unicode):
         return data.encode('utf-8')
     # if this is a list of values, return list of byteified values
     if isinstance(data, list):
-        return [ _byteify(item, ignore_dicts=True) for item in data ]
+        return [_byteify(item, ignore_dicts=True) for item in data]
     # if this is a dictionary, return dictionary of byteified keys and values
     # but only if we haven't already byteified it
     if isinstance(data, dict) and not ignore_dicts:
@@ -42,12 +46,17 @@ def _byteify(data, ignore_dicts = False):
 
 
 class GameState(object):
-    def __init__(self, marbles, initial_length=(14,14)):
+    node_counter = 0
+
+    def __init__(self, marbles, initial_length=(14, 14), new_game=False):
+        if new_game:
+            GameState.node_counter = 0
         self._marbles = MarbleManager(marbles)
         self._logic = Logic()
         self.initial = initial_length
         self.player_how_lost_marble = 0
         self.state_string_need_update = True
+        GameState.node_counter += 1
 
     def create_state_string(self):
         if self.state_string_need_update:
@@ -57,9 +66,9 @@ class GameState(object):
         return self._state_string
 
     def get_looser(self):
-        '''get_looser() -> get the looser team, False if no one.'''
+        """get_looser() -> get the looser team, False if no one."""
         for team, initial in zip((BLACK, WHITE), self.initial):
-            if initial - len(self._marbles.get_owner(team)) >=6:
+            if initial - len(self._marbles.get_owner(team)) >= 6:
                 return team
         return False
 
@@ -110,7 +119,7 @@ class GameState(object):
     #     return action_list
 
     def get_legal_actions(self, agent_index):
-        "returns all of the legal moves of the current player.todo implement get_all_moves in group class"
+        """returns all of the legal moves of the current player.todo implement get_all_moves in group class"""
 
         legal_actions = []
         player_marbles = self._marbles.get_owner(agent_index)
@@ -123,11 +132,9 @@ class GameState(object):
         return legal_actions
 
     def get_all_moves(self, group, agent_index):
-        '''
-        returns all of the possible moves of the group
-        '''
+        """returns all of the possible moves of the group"""
         action_list = []
-        for i in [0,1,2, 3, 4, 5]:
+        for i in [0, 1, 2, 3, 4, 5]:
             try:
                 self._logic.set_marbles(self._marbles)
                 if self._logic.is_legal_move_logic(group, i, agent_index):
@@ -142,8 +149,8 @@ class GameState(object):
         return np.where(self._board == 0)
 
     def apply_action(self, action, agent_index):
-        (group,direction)=(action[0][0],action[0][1])
-        self._logic.marbles=self._marbles
+        (group, direction) = (action[0][0], action[0][1])
+        self._logic.marbles = self._marbles
         moved_group = self._logic.get_moved(group, direction)
         enemy = self._logic.get_mirror_obstacles(group, direction)
         moved_enemy = self._logic.get_moved(enemy, direction)
@@ -172,9 +179,3 @@ class GameState(object):
 
     def is_final_state(self):
         return self.is_terminal
-
-
-
-        # tk=abaloneTk.Game_Board()
-        # tk.start(config.Players.Black.positions,config.Players.White.positions)
-        # tk.mainloop()

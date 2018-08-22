@@ -9,26 +9,28 @@ import humanAgent
 import randomAgent
 import approximateQAgent
 
+
 class Agent_repr(object):
-    def __init__(self, type, depth, num_of_training, player_index):
+    def __init__(self, type, depth, eval_fun, num_of_training, player_index):
         self.agent = None
         if type == 'AlphaBetaAgent':
-            self.agent = alphaBetaAgent.AlphaBetaAgent(depth)
+            self.agent = alphaBetaAgent.AlphaBetaAgent(depth, eval_fun)
         if type == 'KeyboardAgent':
             self.agent = humanAgent.HumanAgent()
         if type == 'RandomAgent':
             self.agent = randomAgent.RandomAgent()
         if type == 'QLearningAgent':
-            self.agent = approximateQAgent.QLearningReplayMemory(player_index=player_index, num_training=num_of_training)
-
+            self.agent = approximateQAgent.QLearningReplayMemory(player_index=player_index,
+                                                                 num_training=num_of_training)
 
 
 class Game(object):
-    def __init__(self, agent1_type, agent2_type, board_type,depth, num_of_training):
+    def __init__(self, agent1_type, agent2_type, board_type, depth, num_of_training, agent1_eval=None,
+                 agent2_eval=None):
         super(Game, self).__init__()
         self.tkState = None
-        self.player1 = Agent_repr(agent1_type, depth, num_of_training, 1)
-        self.player2 = Agent_repr(agent2_type, depth, num_of_training, -1)
+        self.player1 = Agent_repr(agent1_type, depth, agent1_eval, num_of_training, 1)
+        self.player2 = Agent_repr(agent2_type, depth, agent2_eval, num_of_training, -1)
         self.board = self.create_board(board_type)
         self.depth = depth
         self._state = None
@@ -46,6 +48,8 @@ class Game(object):
         self.board.start(config.Players.Black.positions, config.Players.White.positions)
         initial = self.board.get_initial()
         player_index = 1
+        marbles = self.board.get_marbles()
+        gameState.GameState(marbles, initial, True)
         if self.humanPlayers == 3:
             state = abaloneTk.Game_Board()
             state.start(config.Players.Black.positions, config.Players.White.positions)
@@ -60,15 +64,15 @@ class Game(object):
                 state = gameState.GameState(marbles, initial)
                 self.board.changed = False
                 if player_index == 1:
-                    self.player1.agent.get_action(state, player_index, self.board)
+                    count = self.player1.agent.get_action(state, player_index, self.board)
                 else:
-                    start_time = timeit.default_timer()
+                    # start_time = timeit.default_timer()
                     self.player2.agent.get_action(state, player_index, self.board)
 
-                    elapsed = timeit.default_timer() - start_time
+                    # elapsed = timeit.default_timer() - start_time
 
                     # print(elapsed)
                 if self.board.get_looser():
-                    return self.board.get_looser(), turn_counter
+                    return self.board.get_looser(), turn_counter, state.node_counter
                 player_index *= -1
                 turn_counter += 1

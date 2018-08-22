@@ -4,7 +4,7 @@ from abalone import Action, Marble, MarbleManager
 import tk
 
 
-def eval_fn(game_state, agent_index):
+def eval_fn_original(game_state, agent_index):
     score = 0
     if eval.lost_marbles(game_state, agent_index) != 0:
         score += eval.lost_marbles(game_state, agent_index) * 1000
@@ -34,6 +34,48 @@ def eval_fn(game_state, agent_index):
     score -= eval.attacked_by_opponent(game_state, agent_index) * 10
     return score
 
+def eval_fn_lost_marbles(game_state, agent_index):
+    score = 0
+    if eval.lost_marbles(game_state, agent_index) != 0:
+        score += eval.lost_marbles(game_state, agent_index) * 1000
+    return score
+
+def eval_fn_win_or_lose(game_state, agent_index):
+    score = 0
+    if len(game_state._marbles.get_owner(agent_index)) < 9:
+        score -= 1000000
+    if len(game_state._marbles.get_owner(agent_index * (-1))) < 9:
+        score += 1000000
+    return score
+
+def eval_fn_sumito(game_state, agent_index):
+    score = 0
+    score += eval.attacking_opponent(game_state, agent_index) * 10
+    score -= eval.attacked_by_opponent(game_state, agent_index) * 10
+    return score
+
+def eval_fn_defensive(game_state, agent_index):
+    score = 0
+    dist_from_center = eval.dist_from_center(game_state, agent_index)
+    if dist_from_center < 24:
+        score += 400
+    elif dist_from_center < 30:
+        score += 300
+    elif dist_from_center < 35:
+        score += 200
+    elif dist_from_center < 40:
+        score += 100
+    group_score = eval.own_marbles_grouping(game_state, agent_index)
+    if group_score > 55:
+        score += 320
+    elif group_score > 50:
+        score += 240
+    elif group_score > 45:
+        score += 180
+    elif group_score > 40:
+        score += 80
+
+    return score
 
 def aggressive_eval_fn(game_state, agent_index):
     score = 0
@@ -147,13 +189,12 @@ class AlphaBetaAgent():
 
         game_state = self.marble_list_creator(game_state)
         a = max_agent(game_state, agent_index, 0, float("-inf"), float("inf"))
-        # if isinstance(board, tk.Game_Board):
-        #     board.move(a[0], True)
-        #     board.update_idletasks()
-        # else:
-        #TODO : restore
-        board.move(a[0][0], a[0][1])
-        board.next()
+        if isinstance(board, tk.Game_Board):
+            board.move(a[0], True)
+            board.update_idletasks()
+        else:
+            board.move(a[0][0], a[0][1])
+            board.next()
         return a[0]
 
     def marble_list_creator(self, state):

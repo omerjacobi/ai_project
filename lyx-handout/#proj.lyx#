@@ -79,7 +79,7 @@
 \begin_body
 
 \begin_layout Title
-Abalone - Introduction to artificial intelligance 
+Abalone - Introduction To Artificial Intelligance 
 \begin_inset Newline newline
 \end_inset
 
@@ -91,7 +91,7 @@ Rubi Mizrachi - Guy Golran - Omer Jacobi - Rom Zats
 \end_layout
 
 \begin_layout Special Paper Notice
-The Hebrew University of Jerusalem Jerusalem, Israel
+The Hebrew University of Jerusalem, Israel
 \end_layout
 
 \begin_layout Section
@@ -176,7 +176,8 @@ center
 \end_layout
 
 \begin_layout Section
-Abalone - Is it suitable for ai learning? 
+Abalone - Is it suitable for A.I.
+ learning? 
 \end_layout
 
 \begin_layout Standard
@@ -215,7 +216,7 @@ The state-space complexity of a game is defined as the number of legal game
  formula:
 \begin_inset Formula 
 \[
-\sum_{k=8}^{14}\sum_{k=8}^{14}\frac{61!}{k!\left(61-k\right)!}\times\frac{\left(61-k\right)!}{m!\left(\left(61-k\right)-m\right)!}
+\sum_{k=8}^{14}\sum_{k=8}^{14}\frac{61!}{k!\left(61-k\right)!}\cdot\frac{\left(61-k\right)!}{m!\left(\left(61-k\right)-m\right)!}
 \]
 
 \end_inset
@@ -358,14 +359,21 @@ One of the reasons we decided to implement Alpha-Beta algorithm is that
  we also decided to try these several methods of improvements: Multiprocessing
  with Alpha-Beta , Minimal window search, move ordering and transportation
  table.
- Multiprocessing with Alpha-Beta :We wanted to use in our favor one of the
- biggest improvements we had in last several years in terms of processors
- -which is multiprocessing, we started to explore which way is the best
- to combine our multiprocessing power in our program, we thought about combining
- our multi-cores in the actual alpha-beta search, but it turned out to be
- very difficult and complex to do alpha beta search in parallel , there
- are a lot of dependencies between all of the processors -making it very
- hard to co-work all together.
+ 
+\end_layout
+
+\begin_layout Subsubsection
+Multiprocessing with Alpha-Beta:
+\end_layout
+
+\begin_layout Standard
+We wanted to use in our favor one of the biggest improvements we had in
+ last several years in terms of processors -which is multiprocessing, we
+ started to explore which way is the best to combine our multiprocessing
+ power in our program, we thought about combining our multi-cores in the
+ actual alpha-beta search, but it turned out to be very difficult and complex
+ to do alpha beta search in parallel , there are a lot of dependencies between
+ all of the processors -making it very hard to co-work all together.
  We examined the results of our program and noticed that one of the most
  consuming things we done is state generation - in order to generate a proper
  game state in abalone we had to supply all N possible actions from state
@@ -375,10 +383,14 @@ One of the reasons we decided to implement Alpha-Beta algorithm is that
  (stands next to each other in a straight line position), so if we try to
  approximate the running time it takes - if our game state is mid-game position,
  let say we still have 14 marbles in the possession of our alpha-beta agent,
- so we need to check (14*13*12+14*13+14) options, and every single one of
- those options of group needs to be checked in several methods that require
- significant processing time, therefore we decided to try and split all
- of those options of possible groups among all processors we had (4).
+ so we need to check 
+\begin_inset Formula $(14\cdot13\cdot12+14\cdot13+14)$
+\end_inset
+
+ options, and every single one of those options of group needs to be checked
+ in several methods that require significant processing time, therefore
+ we decided to try and split all of those options of possible groups among
+ all processors we had (4).
  we sent each processor a chunk of combinations of marbles and got back
  in return only the valid groups they found (each processor run the desired
  methods in order to check if the current group is valid).
