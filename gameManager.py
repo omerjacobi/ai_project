@@ -1,4 +1,3 @@
-import timeit
 
 import abalone
 import config
@@ -7,32 +6,57 @@ import alphaBetaAgent
 import gameState
 import humanAgent
 import randomAgent
-import approximateQAgent
-
+import NNAgent
 
 class Agent_repr(object):
-    def __init__(self, type, depth, eval_fun, num_of_training, player_index):
+    def __init__(self, type, depth, num_of_training, player_index, train_agent_str, train_agent_hue,
+                 show_tk):
         self.agent = None
+        heuristics = [alphaBetaAgent.eval_fn_original, alphaBetaAgent.eval_fn_lost_marbles,
+                      alphaBetaAgent.eval_fn_sumito, alphaBetaAgent.eval_fn_defensive,
+                      alphaBetaAgent.aggressive_eval_fn]
+        heuristics_str = ['Full', 'Lost marbles', 'Sumito', 'Defensive', 'Aggressive_Full']
+
         if type == 'AlphaBetaAgent':
-            self.agent = alphaBetaAgent.AlphaBetaAgent(depth, eval_fun)
+            self.agent = alphaBetaAgent.AlphaBetaAgent(depth)
+            if show_tk:
+                self.agent.show_tk()
         if type == 'KeyboardAgent':
             self.agent = humanAgent.HumanAgent()
         if type == 'RandomAgent':
-            self.agent = randomAgent.RandomAgent()
-        if type == 'QLearningAgent':
-            self.agent = approximateQAgent.QLearningReplayMemory(player_index=player_index,
-                                                                 num_training=num_of_training)
+            self.agent = randomAgent.RandomAgent(show_tk)
+        if type == 'NNAgent':
+            if train_agent_str== 'AlphaBetaAgent':
+                hue = heuristics[0]
+                if train_agent_hue!=None:
+                    hue = heuristics[heuristics_str.index(train_agent_hue)]
+                train_agent = alphaBetaAgent.AlphaBetaAgent(1, hue)
+                if show_tk:
+                    self.train_agent.show_tk()
+            elif train_agent_str == 'KeyboardAgent':
+                train_agent = humanAgent.HumanAgent()
+            else:
+                train_agent_str = 'RandomAgent'
+                train_agent = randomAgent.RandomAgent(show_tk)
+            if train_agent_hue == None:
+                train_agent_hue = 'no_hue'
+            self.agent = NNAgent.NN(train_agent, train_agent_str, train_agent_hue,
+                                    player_index=player_index, num_training=num_of_training, show_tk=show_tk)
+
 
 
 class Game(object):
-    def __init__(self, agent1_type, agent2_type, board_type, depth, num_of_training, agent1_eval=None,
-                 agent2_eval=None):
+    def __init__(self, train_agent, train_agent_hue, agent1_type, agent2_type, board_type, depth,
+                 num_of_training):
         super(Game, self).__init__()
-        self.tkState = None
-        self.player1 = Agent_repr(agent1_type, depth, agent1_eval, num_of_training, 1)
-        self.player2 = Agent_repr(agent2_type, depth, agent2_eval, num_of_training, -1)
+        self._is_tk = board_type == 'GUI'
+        # self.tkState = None
+        self.player1 = Agent_repr(agent1_type, depth, num_of_training, 1, train_agent,
+                                  train_agent_hue, self._is_tk)
+        self.player2 = Agent_repr(agent2_type, depth, num_of_training, -1, train_agent,
+                                  train_agent_hue, self._is_tk)
         self.board = self.create_board(board_type)
-        self.depth = depth
+
         self._state = None
         """if 'humanPlayer'=0 no player is human 1,2 indicate which is human, 3 means both are human"""
         self.humanPlayers = int(agent1_type == 'KeyboardAgent') + int(agent2_type == 'KeyboardAgent') * 2
@@ -41,6 +65,7 @@ class Game(object):
         if type == 'SummaryDisplay':
             return abalone.Game_Board()
         elif type == 'GUI':
+            self._is_tk = True
             return abaloneTk.Game_Board()
         return None
 
@@ -55,7 +80,7 @@ class Game(object):
             state.start(config.Players.Black.positions, config.Players.White.positions)
             state.mainloop()
         else:
-            if isinstance(self.board, abaloneTk.Game_Board):
+            if self._is_tk:
                 self.board.update_idletasks()
             self.board.changed = False
             turn_counter = 0
@@ -73,6 +98,15 @@ class Game(object):
 
                     # print(elapsed)
                 if self.board.get_looser():
-                    return self.board.get_looser(), turn_counter, state.node_counter
+                    loser = self.board.get_looser()
+                    if self._is_tk:
+                        self.board.stop()
+                    return loser, turn_counter
                 player_index *= -1
                 turn_counter += 1
+                if turn_counter > 5000:
+                    if self._is_tk:
+                        self.board.stop()
+                    return 0, turn_counter
+
+

@@ -113,10 +113,14 @@ class AlphaBetaAgent():
     Minimax agent with alpha-beta pruning
     """
 
-    def __init__(self, depth, evaluation_function=aggressive_eval_fn):
+    def __init__(self, depth, evaluation_function=eval_fn_original):
         self.depth = depth
         self.evaluation_function = evaluation_function
+        self._is_tk = False
         self.transposition_table = dict()
+
+    def show_tk(self):
+        self._is_tk = True
 
     def get_action(self, game_state, agent_index, board):
         """
@@ -189,7 +193,7 @@ class AlphaBetaAgent():
 
         game_state = self.marble_list_creator(game_state)
         a = max_agent(game_state, agent_index, 0, float("-inf"), float("inf"))
-        if isinstance(board, tk.Game_Board):
+        if self._is_tk:
             board.move(a[0], True)
             board.update_idletasks()
         else:

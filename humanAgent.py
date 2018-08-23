@@ -1,10 +1,6 @@
 import time
 
 
-#
-# def eval_fn(game_state, agent_index):
-#     return 5 * eval.lost_marbles(game_state, agent_index) + eval.dist_from_center(game_state, agent_index)
-
 
 class HumanAgent():
     """

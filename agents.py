@@ -2,19 +2,13 @@
 File for breakout-playing agents
 
 """
-import abc
 from collections import defaultdict
 import re
 import math
-import random
 import util
 import string
-# from function_approximators import *
 import random
-from replay_memory import ReplayMemory
 import copy
-from eligibility_tracer import EligibilityTrace
-import numpy as np
 import tk as abaloneTk
 
 DEF_GAMMA = 0.993

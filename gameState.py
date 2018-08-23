@@ -1,8 +1,6 @@
 import itertools
 import numpy as np
 from abalone import Group, Logic, Action, Marble, MarbleManager
-import multiprocessing
-import numpy
 import json
 
 BLACK = 1
@@ -71,52 +69,6 @@ class GameState(object):
             if initial - len(self._marbles.get_owner(team)) >= 6:
                 return team
         return False
-
-    # def get_legal_actions(self, agent_index):
-    #     "returns all of the legal moves of the current player.todo implement get_all_moves in group class"
-    #
-    #     legal_actions = []
-    #     player_marbles = self._marbles.get_owner(agent_index)
-    #     for i in range(1, 4):
-    #         for subset in itertools.combinations(player_marbles, i):
-    #             group = Group(subset)
-    #             if group.is_valid():
-    #                 pool=multiprocessing.Pool(multiprocessing.cpu_count())
-    #                 curlist=pool.apply_async(unwrap_self_g,group,agent_index,self._marbles).get()
-    #                 legal_actions +=curlist
-    #                 pool.terminate()
-    #     legal_actions.reverse()
-    #     return legal_actions
-    #
-    # def get_all_moves(self, group, agent_index):
-    #     '''
-    #     returns all of the possible moves of the group
-    #     '''
-    #     action_list = []
-    #     for i in [0,1,2, 3, 4, 5]:
-    #         try:
-    #             self._logic.set_marbles(self._marbles)
-    #             if self._logic.is_legal_move_logic(group, i, agent_index):
-    #                 act = Action(group, i)
-    #                 action_list.append(act)
-    #         except AssertionError:
-    #             continue
-    #     return action_list
-    #
-    # def get_all_moves2(self, group, agent_index,marbles):
-    #     '''
-    #     returns all of the possible moves of the group
-    #     '''
-    #     action_list = []
-    #     for i in [0,1,2, 3, 4, 5]:
-    #         try:
-    #             logic=Logic()
-    #             if logic.is_legal_move_logic(group, i, agent_index):
-    #                 act = Action(group, i)
-    #                 action_list.append(act)
-    #         except AssertionError:
-    #             continue
-    #     return action_list
 
     def get_legal_actions(self, agent_index):
         """returns all of the legal moves of the current player.todo implement get_all_moves in group class"""

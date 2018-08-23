@@ -1,6 +1,3 @@
-# import abalone
-# import gameState
-# import config
 
 
 distances_from_center = {(5, 5): 0,                                                                     # Center position
@@ -168,14 +165,3 @@ def attacked_by_opponent(state, agent_index):
     """
     return attacking_opponent(state, -agent_index)
 
-
-# new_black = [(2,2), (2,5), (4,2), (4,4), (5,4), (5,6), (6,4), (6,5), (6,6), (6,7), (7,4), (7,5), (7,6), (7,8)]
-# new_white = [(2,4), (3,2), (3,3), (3,5), (4,3), (4,5), (4,6), (4,7), (5,2), (5,3), (5,5), (6,3), (8,6)]
-#
-# board = abalone.Game_Board()
-# board.start(config.Players.Black.positions, config.Players.White.positions)
-# board.start(new_black, new_white)
-# initial = board.get_initial()
-# marbles = board.get_marbles()
-# state = gameState.GameState(marbles, initial)
-# print(attacked_by_opponent(state, BLACK))
