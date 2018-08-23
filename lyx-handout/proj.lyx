@@ -79,7 +79,7 @@
 \begin_body
 
 \begin_layout Title
-Abalone - Introduction to artificial intelligance 
+Abalone - Introduction to artificial intelligence 
 \begin_inset Newline newline
 \end_inset
 
@@ -122,7 +122,7 @@ Abalone game was invented in 1987 by Michel Lalet and Laurent Lévi,it is
 
 \begin_layout Standard
 for each move, a player moves a straight line of one ,two or three marbles.
- a player can push their opponent’s marbles (a “sumito” move) , a player
+ a player can push their opponent’s marbles (a “Sumito” move) , a player
  can push only if the pushing line has more marbles than the pushed line
  (three can push one or two, two can push one).
 \end_layout
@@ -176,7 +176,8 @@ center
 \end_layout
 
 \begin_layout Section
-Abalone - Is it suitable for ai learning? 
+Abalone - Is it suitable for A.I.
+ learning? 
 \end_layout
 
 \begin_layout Standard
@@ -208,7 +209,7 @@ state-space complexity:
 
 \begin_layout Standard
 The state-space complexity of a game is defined as the number of legal game
- positions reachable from the ini- tial position of the game.
+ positions reachable from the initial position of the game.
  All situations where one player has nine marbles and the other less than
  eight are illegal (since the game ends when a player loses the sixth marble).
  The state-space complexity can therefore be approximated by the following
@@ -345,6 +346,34 @@ This section describes the techniques and algorithms used in our research
 \end_layout
 
 \begin_layout Subsection
+Alpha-Beta tree search
+\end_layout
+
+\begin_layout Standard
+The first approach tested was Alpha-Beta tree search - A search algorithm
+ that seeks to decrease the number of nodes that are evaluated by the MiniMax
+ algorithm in its search tree.
+ It is an adversarial search algorithm used commonly for machine playing
+ of two-player games (Chess, Go, etc.).
+ It stops completely evaluating a move when at least one possibility has
+ been found that proves the move to be worse than a previously examined
+ move.
+ Such moves need not be evaluated further.
+ When applied to a standard MiniMax tree, it returns the same move as MiniMax
+ would, but prunes away branches that cannot possibly influence the final
+ decision.
+ 
+\end_layout
+
+\begin_layout Standard
+This approach proved strong enough to win against us in most games even
+ for rater modest search depth of 4 (But we are not the best players), iteration
+s allowing deeper vision proved better but were practically unplayable since
+ average game duration was around 5 hours (see in results), we did try to
+ improve performance in few ways.
+\end_layout
+
+\begin_layout Subsubsection
 Alpha-Beta Improvements 
 \end_layout
 
@@ -362,7 +391,7 @@ One of the reasons we decided to implement Alpha-Beta algorithm is that
  table.
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Paragraph
 Multiprocessing with Alpha-Beta
 \end_layout
 
@@ -401,7 +430,7 @@ We wanted to use in our favor one of the biggest improvements we had in
  
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Paragraph
 Move ordering
 \end_layout
 
@@ -421,7 +450,7 @@ We concluded from our knowledge of Alpha-Beta algorithm that it may spare
  section below.
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Paragraph
 Transportation table
 \end_layout
 
@@ -438,15 +467,15 @@ We noticed that Abalone is a game which is very repetitive in terms of game
  transportation table,as will be presented below in the experiments section.
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 Evaluation function 
 \end_layout
 
 \begin_layout Standard
 In addition to focusing on improving Alpha-Beta in general we focused at
- finding good heuristics for our Abalone game, we know that a good heuristic
- means efficient exploration of the game tree, meaning improvement of running
- time and performance.
+ finding good heuristics for our Abalone game solver, we know that a good
+ heuristic means efficient exploration of the game tree, meaning improvement
+ of running time and performance.
 \begin_inset Newline newline
 \end_inset
 
@@ -465,7 +494,7 @@ The use of heuristics is useless if we search the whole tree - if we go
  in order to find the best evaluation function there is.
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Paragraph
 Defensive positions
 \end_layout
 
@@ -488,7 +517,7 @@ Defensive position
  hard time grouping together if we will control the center of the board.
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Paragraph
 Attacking and attacked (Sumito positions)
 \end_layout
 
@@ -512,7 +541,7 @@ A Sumito move is a move where some opponent’s marbles are pushed by moving
  us).
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Paragraph
 Lost marbles 
 \end_layout
 
@@ -528,15 +557,15 @@ We know that according to the game rules - the first player that manages
  the better one can attack and defend.
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Paragraph
 Win or loss
 \end_layout
 
 \begin_layout Standard
 We want to give a excessively good score to states that represent victory
- to us ( states in which the opponent has only 8 marbles while we got more
- than 8) therefore we also calculated and scored states according to their
- winning
+ to us (states in which the opponent has only 8 marbles while Monte-Carlo
+ Search we got more than 8) therefore we also calculated and scored states
+ according to their winning
 \backslash
 losing 
 \begin_inset Quotes eld
@@ -547,6 +576,213 @@ feature
 \end_inset
 
 .
+\end_layout
+
+\begin_layout Paragraph
+Combinations
+\end_layout
+
+\begin_layout Standard
+To improve the quality of the evaluation function different configurations
+ of the above heuristics and different weightings were defined.
+ Players using these different configurations played several games against
+ a random move agent.
+ The two best combinations where tested by playing against each other.
+ By the outcome of those games it was assessed which player performs best.
+ It turned out that both agents used the same 
+\begin_inset Quotes eld
+\end_inset
+
+sub-heuristics
+\begin_inset Quotes erd
+\end_inset
+
+ with different weights.
+\end_layout
+
+\begin_layout Standard
+(*) Defensive heuristic: Careful trail and error process was used in order
+ to achieve a heuristic that is focused on allowing the opponent as few
+ attacking opportunities while still favoring opponent marble taking (if
+ it is beneficial)
+\end_layout
+
+\begin_layout Standard
+(*) Aggressive heuristic: Same careful trail and error process was used
+ in order to achieve a heuristic that is more focused on taking opponent
+ marbles but still trying to allow as few attacking opportunities to the
+ opponent
+\end_layout
+
+\begin_layout Subsection
+Q-learning
+\end_layout
+
+\begin_layout Standard
+The second approach tested was Q-learning - A reinforcement learning technique.
+ The goal of Q-Learning is to learn a policy, which tells an agent what
+ action to take under what circumstances.
+ 
+\end_layout
+
+\begin_layout Standard
+We tried to model the problem such that positive reward will be given for
+ enemy marble lose and for winning, negative reward was given for lost marbles
+ and lost games.
+\end_layout
+
+\begin_layout Standard
+Few different approaches were used 
+\end_layout
+
+\begin_layout Subsubsection
+Naive Q-learning 
+\end_layout
+
+\begin_layout Standard
+In this case we ran the learning process simply with a game state and a
+ possible move as input and tried to give each given state a reward.
+ due to the very large game-state space that the problem generates.
+ The learning process was very slow - too slow for long enough learning
+ period which made the resulting agent very bad performing.
+ 
+\begin_inset Float figure
+placement H
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Win rate of Naive Q-learner against different agents 
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+center
+\end_layout
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename Screenshot from 2018-08-22 12-36-19.png
+	scale 40
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Q-learning approximation
+\end_layout
+
+\begin_layout Standard
+To overcome the above problem we tried to combine our Q-learning agent with
+ function approximation.
+ This method makes it possible to apply the algorithm to larger problems,
+ even when the state space is continuous.
+ It does that using an approximation function 
+\end_layout
+
+\begin_layout Standard
+It turned out that this tactic was again not good enough (the learning process
+ was fast but didn't produce good results).
+ 
+\begin_inset Float figure
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Win rate of approximation Q-learner against different agents 
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+center
+\end_layout
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename Screenshot from 2018-08-22 12-36-19.png
+	scale 40
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Q-learning approximation with artificial neural network
+\end_layout
+
+\begin_layout Standard
+Since Q-learning approximation is best used for models with immediate reward
+ which our problem is lacking (since marble lose/win or game win occur very
+ rarely and 
+\begin_inset Quotes eld
+\end_inset
+
+bad
+\begin_inset Quotes erd
+\end_inset
+
+ moves can be counted as moves that lead to marble lose in the future).
+ We decided to incorporate a neural-network architecture to the Q-learning
+ approximation process.
+ We used the same 
+\end_layout
+
+\begin_layout Section
+Results
+\end_layout
+
+\begin_layout Standard
+blah
+\end_layout
+
+\begin_layout Section
+Results
+\end_layout
+
+\begin_layout Standard
+blah
 \end_layout
 
 \end_body
