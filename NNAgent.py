@@ -23,7 +23,7 @@ class NN(BaseAgent):
         towards a random sample of past experiences
     """
     def __init__(self, training_agent, train_agent_str='random', train_agent_hue='no_hue',
-                 epsilon=0.5, gamma=0.990, stepSize=None, player_index=0, num_training=1, show_tk=False):
+                 epsilon=0.5, gamma=0.990, stepSize=None, player_index=0, num_training=1, show_tk=False, load_data=False):
         self.train_agent_str=train_agent_str
         self.train_agent_hue = train_agent_hue
         self.train_agent = training_agent
@@ -41,7 +41,21 @@ class NN(BaseAgent):
         self.agent_index = player_index
         self.numTraining = num_training
         self._show_tk = show_tk
-        self.training()
+        if load_data:
+            tf.reset_default_graph()
+
+            new_saver = tf.train.import_meta_graph('./train/' + self.train_agent_str + '_hue_' + self.train_agent_hue +
+                                                   '_num_of_trains_' + str(self.numTraining) + '_ts' + '.meta')
+            self.sess = tf.Session()
+            self.sess.run(tf.global_variables_initializer())
+            new_saver.restore(self.sess, './train/' + self.train_agent_str + '_hue_' + self.train_agent_hue +
+                              '_num_of_trains_' + str(self.numTraining) + '_ts')
+            graph = self.sess.graph
+            # print([node.name for node in graph.as_graph_def().node])
+            self.explorationProb = 0.001
+
+        else:
+            self.training()
 
     def training(self):
         enemy = self.train_agent

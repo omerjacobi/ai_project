@@ -129,7 +129,6 @@ class AlphaBetaAgent():
         # self.evaluation_function = eval_fn if agent_index == 1 else aggressive_eval_fn
 
         def max_agent(game_state, agent_index, depth, alpha, beta):
-
             legal_moves = game_state.get_legal_actions(agent_index)
             if len(legal_moves) == 0:
                 return Action.STOP

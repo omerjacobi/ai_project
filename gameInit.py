@@ -20,7 +20,7 @@ import alphaBetaAgent
 
 class GameRunner(object):
     def __init__(self, train_agent_hue, train_agent, board=None, agent1=None, agent2=None,
-                 depth=None, num_of_training=None):
+                 depth=None, num_of_training=None, load_data=False):
         super(GameRunner, self).__init__()
         self._agent1 = agent1
         self._agent2 = agent2
@@ -31,6 +31,7 @@ class GameRunner(object):
         self.current_game = None
         self.num_of_training = num_of_training
         self.game = None
+        self.load_data = load_data
 
     def new_game(self, eval_1=None, eval_2=None):
         # self.quit_game()
@@ -39,7 +40,8 @@ class GameRunner(object):
                                          train_agent_hue=self._train_agent_hue,
                                          agent1_type=self._agent1, agent2_type=self._agent2,
                                          board_type=self.board, depth=self.depth,
-                                         num_of_training=self.num_of_training)
+                                         num_of_training=self.num_of_training,
+                                         load_data=self.load_data)
         self.current_game = self.game
         return self.game.run()
 
@@ -135,12 +137,13 @@ def main():
     parser.add_argument('--num_of_games', help='The number of games to run.', default=1, type=int)
     parser.add_argument('--num_of_training', help='The number of training to run.', default=10, type=int)
     parser.add_argument('--initial_board', help='Initial board for new games.', default=None, type=str)
+    parser.add_argument('--load_NN_data', help='Should the NN agent train or load a previous session?', default=False, type=bool)
 
     args = parser.parse_args()
     board = args.display
     num_of_games = args.num_of_games
     game_runner = GameRunner(train_agent=args.train_agent, train_agent_hue=args.train_agent_heu, board=board, agent1=args.agent1, agent2=args.agent2,
-                             depth=args.depth, num_of_training=args.num_of_training)
+                             depth=args.depth, num_of_training=args.num_of_training, load_data=args.load_NN_data)
     victories = [0,0]    # index 0 is for BLACK, index 1 is for white
     game_or_games = " game:" if num_of_games == 1 else " games:"
     print("\tRunning " + str(num_of_games) + game_or_games)

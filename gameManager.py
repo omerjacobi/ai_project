@@ -10,7 +10,7 @@ import NNAgent
 
 class Agent_repr(object):
     def __init__(self, type, depth, num_of_training, player_index, train_agent_str, train_agent_hue,
-                 show_tk):
+                 show_tk, load_NN_data):
         self.agent = None
         heuristics = [alphaBetaAgent.eval_fn_original, alphaBetaAgent.eval_fn_lost_marbles,
                       alphaBetaAgent.eval_fn_sumito, alphaBetaAgent.eval_fn_defensive,
@@ -41,20 +41,20 @@ class Agent_repr(object):
             if train_agent_hue == None:
                 train_agent_hue = 'no_hue'
             self.agent = NNAgent.NN(train_agent, train_agent_str, train_agent_hue,
-                                    player_index=player_index, num_training=num_of_training, show_tk=show_tk)
+                                    player_index=player_index, num_training=num_of_training, show_tk=show_tk, load_data=load_NN_data)
 
 
 
 class Game(object):
     def __init__(self, train_agent, train_agent_hue, agent1_type, agent2_type, board_type, depth,
-                 num_of_training):
+                 num_of_training, load_data):
         super(Game, self).__init__()
         self._is_tk = board_type == 'GUI'
         # self.tkState = None
         self.player1 = Agent_repr(agent1_type, depth, num_of_training, 1, train_agent,
-                                  train_agent_hue, self._is_tk)
+                                  train_agent_hue, self._is_tk, load_data)
         self.player2 = Agent_repr(agent2_type, depth, num_of_training, -1, train_agent,
-                                  train_agent_hue, self._is_tk)
+                                  train_agent_hue, self._is_tk, load_data)
         self.board = self.create_board(board_type)
 
         self._state = None
