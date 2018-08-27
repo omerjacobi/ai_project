@@ -72,7 +72,7 @@ class NN(BaseAgent):
                     num_of_marble_eaten = len(state._marbles.get_owner(-self.agent_index))
                     action = self.takeAction((state, curr_index, board))
                     new_state = gameState.GameState(board.get_marbles(), initial)
-                    if board.get_looser():
+                    if board.get_looser() or counter > 3000:
                         new_state = gameState.GameState(board.get_marbles(), initial)
                         break
                 else:
@@ -82,7 +82,7 @@ class NN(BaseAgent):
                     enemy.get_action(new_state, curr_index, board)
                     e_new_state = gameState.GameState(board.get_marbles(), initial)
                     num_of_marbles_lost -= len(e_new_state._marbles.get_owner(self.agent_index))
-                    if board.get_looser():
+                    if board.get_looser() or counter > 3000:
                         break
                     if counter > 1:
                         if num_of_marble_eaten > 0:
@@ -97,9 +97,12 @@ class NN(BaseAgent):
             if board.get_looser() == self.agent_index:
                 self.incorporateFeedback(state, action, -1, new_state, self.agent_index)
                 arr.append('lost')
-            else:
+            elif board.get_looser() == -self.agent_index:
                 self.incorporateFeedback(state, action, +1, new_state, self.agent_index)
                 arr.append('win')
+            else:
+                self.incorporateFeedback(state, action, 0, new_state, self.agent_index)
+                arr.append('draw')
             self.explorationProb -= self.eps_dif
             print("Finished Training number: " + str(i + 1) + " after " + str(counter) + " plays")
             print("Number of marble lost: " + str(total_num_lost) + ", Number of marble enemy lost: " + str( total_num_eaten))
