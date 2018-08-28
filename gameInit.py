@@ -123,7 +123,7 @@ class GameRunner(object):
 """main function for running normal game - no loop"""
 def main():
     parser = argparse.ArgumentParser(description='Abalone game.')
-    heuristics_str = ['Full', 'Lost marbles', 'Sumito', 'Defensive', 'Aggressive_Full']
+    heuristics_str = ['Full', 'Lost_marbles', 'Sumito', 'Defensive', 'Aggressive_Full']
     displays = ['GUI', 'SummaryDisplay']
     agents = ['KeyboardAgent', 'AlphaBetaAgent', 'RandomAgent', 'NNAgent']
     train_agents = ['KeyboardAgent', 'AlphaBetaAgent', 'RandomAgent']

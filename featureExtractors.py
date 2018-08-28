@@ -4,6 +4,7 @@
 import util
 import evaluation
 from abalone import Marble, Action
+import numpy
 
 class FeatureExtractor:  
   def getFeatures(self, state, action, player_index):
@@ -29,13 +30,20 @@ class SimpleExtractor(FeatureExtractor):
   def getFeatures(self, state, action, player_index):
     features = dict()
     successor = state.generate_successor(player_index, action)
-    features["sumito"] = evaluation.attacking_opponent(successor, player_index) - evaluation.attacking_opponent(state, player_index)
-    features["op_sumito"] = evaluation.attacked_by_opponent(successor,player_index) - evaluation.attacked_by_opponent(state,player_index)
-    features["grouping"] = evaluation.own_marbles_grouping(successor, player_index) - evaluation.own_marbles_grouping(state, player_index)
-    features["op_grouping"] = evaluation.opposing_marbles_grouping(successor, player_index) - evaluation.opposing_marbles_grouping(state, player_index)
-    features["marbles"] = evaluation.lost_marbles(successor,player_index) - evaluation.lost_marbles(state,player_index)
-    features["to_center"] = evaluation.dist_from_center(successor, player_index)
-    features["op_to_center"] = evaluation.dist_from_center(successor, -player_index)
+    arr_state_rpr = numpy.zeros(shape=(9, 9))
+    for marble in successor._marbles:
+        if (marble['owner'] == 1):
+          arr_state_rpr[marble['position'][0] - 1][marble['position'][1] - 1] = 1
+        else:
+          arr_state_rpr[marble['position'][0] - 1][marble['position'][1] - 1] = 2
+    return numpy.matrix(numpy.reshape(arr_state_rpr,81))
+    # features["sumito"] = evaluation.attacking_opponent(successor, player_index) - evaluation.attacking_opponent(state, player_index)
+    # features["op_sumito"] = evaluation.attacked_by_opponent(successor,player_index) - evaluation.attacked_by_opponent(state,player_index)
+    # features["grouping"] = evaluation.own_marbles_grouping(successor, player_index) - evaluation.own_marbles_grouping(state, player_index)
+    # features["op_grouping"] = evaluation.opposing_marbles_grouping(successor, player_index) - evaluation.opposing_marbles_grouping(state, player_index)
+    # features["marbles"] = evaluation.lost_marbles(successor,player_index) - evaluation.lost_marbles(state,player_index)
+    # features["to_center"] = evaluation.dist_from_center(successor, player_index)
+    # features["op_to_center"] = evaluation.dist_from_center(successor, -player_index)
 
 
 
@@ -49,4 +57,4 @@ class SimpleExtractor(FeatureExtractor):
 
 
 
-    return features
+    # return features

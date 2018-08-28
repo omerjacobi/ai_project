@@ -15,7 +15,7 @@ class Agent_repr(object):
         heuristics = [alphaBetaAgent.eval_fn_original, alphaBetaAgent.eval_fn_lost_marbles,
                       alphaBetaAgent.eval_fn_sumito, alphaBetaAgent.eval_fn_defensive,
                       alphaBetaAgent.aggressive_eval_fn]
-        heuristics_str = ['Full', 'Lost marbles', 'Sumito', 'Defensive', 'Aggressive_Full']
+        heuristics_str = ['Full', 'Lost_marbles', 'Sumito', 'Defensive', 'Aggressive_Full']
 
         if type == 'AlphaBetaAgent':
             self.agent = alphaBetaAgent.AlphaBetaAgent(depth)
@@ -32,7 +32,7 @@ class Agent_repr(object):
                     hue = heuristics[heuristics_str.index(train_agent_hue)]
                 train_agent = alphaBetaAgent.AlphaBetaAgent(1, hue)
                 if show_tk:
-                    self.train_agent.show_tk()
+                    train_agent.show_tk()
             elif train_agent_str == 'KeyboardAgent':
                 train_agent = humanAgent.HumanAgent()
             else:

@@ -36,7 +36,7 @@ class NN(BaseAgent):
         self.discount = gamma
         self.getStepSize = stepSize
         self.numIters = 1
-        self.feature_len = 7
+        self.feature_len = 81
         self.input_placeholder, self.target_placeholder, self.loss, self.train_step, self.sess, \
         self.output, self.merged, self.log_writer = self.define_model(self.feature_len)
         self.agent_index = player_index
@@ -48,7 +48,7 @@ class NN(BaseAgent):
             with tf.Session(graph=tf.Graph()) as sess:
                 tf.saved_model.loader.load(sess, [tf.saved_model.tag_constants.SERVING], path)
 
-            self.explorationProb = 0.001
+            self.explorationProb = 0.01
 
         else:
             self.training()
@@ -187,7 +187,8 @@ class NN(BaseAgent):
         :param player_index:
         """
         features = self.fe.getFeatures(state,action,player_index)
-        return util.dictToNpMatrix(features)
+        # return util.dictToNpMatrix(features)
+        return features
 
 
     def incorporateFeedback(self, state, action, reward, newState, player_index):
@@ -265,6 +266,8 @@ class NN(BaseAgent):
         # optimizer = tf.train.GradientDescentOptimizer(learning_rate)
         # train_step = optimizer.minimize(loss)
         train_step = tf.train.AdamOptimizer(.001).minimize(loss)
+        # train_step = tf.train.AdagradDAOptimizer(.001,global_step=tf.train.create_global_step()).minimize(loss)
+
 
         # get session, initialize stuff
         config = tf.ConfigProto(

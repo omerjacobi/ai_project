@@ -1,2 +1,2 @@
-model_checkpoint_path: "RandomAgent_hue_Full_num_of_trains_2_ts"
-all_model_checkpoint_paths: "RandomAgent_hue_Full_num_of_trains_2_ts"
+model_checkpoint_path: "RandomAgent_hue_Full_num_of_trains_20000_ts"
+all_model_checkpoint_paths: "RandomAgent_hue_Full_num_of_trains_20000_ts"
