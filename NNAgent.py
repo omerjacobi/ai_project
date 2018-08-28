@@ -12,8 +12,9 @@ import tk as abaloneTk
 import util
 from agents import BaseAgent
 import featureExtractors as fe
-import json
+import os
 import tensorflow as tf
+import shutil
 
 
 
@@ -42,16 +43,11 @@ class NN(BaseAgent):
         self.numTraining = num_training
         self._show_tk = show_tk
         if load_data:
-            tf.reset_default_graph()
+            path = './train/' + self.train_agent_str + '_hue_' + self.train_agent_hue +'_num_of_trains_'\
+                   + str(self.numTraining) + '_ts/'
+            with tf.Session(graph=tf.Graph()) as sess:
+                tf.saved_model.loader.load(sess, [tf.saved_model.tag_constants.SERVING], path)
 
-            new_saver = tf.train.import_meta_graph('./train/' + self.train_agent_str + '_hue_' + self.train_agent_hue +
-                                                   '_num_of_trains_' + str(self.numTraining) + '_ts' + '.meta')
-            self.sess = tf.Session()
-            self.sess.run(tf.global_variables_initializer())
-            new_saver.restore(self.sess, './train/' + self.train_agent_str + '_hue_' + self.train_agent_hue +
-                              '_num_of_trains_' + str(self.numTraining) + '_ts')
-            graph = self.sess.graph
-            # print([node.name for node in graph.as_graph_def().node])
             self.explorationProb = 0.001
 
         else:
@@ -65,7 +61,9 @@ class NN(BaseAgent):
         else:
             board = abalone.Game_Board()
 
-        arr = list()
+        win_lost_list = list()
+        loss_list = list()
+        reward_list = list()
 
         for i in range(self.numTraining):
             board.start(config.Players.Black.positions, config.Players.White.positions)
@@ -87,6 +85,7 @@ class NN(BaseAgent):
                     action = self.takeAction((state, curr_index, board))
                     new_state = gameState.GameState(board.get_marbles(), initial)
                     if board.get_looser() or counter > 3000:
+                        total_num_eaten += 1
                         new_state = gameState.GameState(board.get_marbles(), initial)
                         break
                 else:
@@ -97,6 +96,9 @@ class NN(BaseAgent):
                     e_new_state = gameState.GameState(board.get_marbles(), initial)
                     num_of_marbles_lost -= len(e_new_state._marbles.get_owner(self.agent_index))
                     if board.get_looser() or counter > 3000:
+                        if num_of_marble_eaten > 0:
+                            total_num_eaten += 1
+                        total_num_lost += 1
                         break
                     if counter > 1:
                         if num_of_marble_eaten > 0:
@@ -109,27 +111,41 @@ class NN(BaseAgent):
 
                 curr_index *= -1
             if board.get_looser() == self.agent_index:
-                self.incorporateFeedback(state, action, -1, new_state, self.agent_index)
-                arr.append('lost')
+                loss = self.incorporateFeedback(state, action, -1, new_state, self.agent_index)
+                win_lost_list.append('lost')
+
             elif board.get_looser() == -self.agent_index:
-                self.incorporateFeedback(state, action, +1, new_state, self.agent_index)
-                arr.append('win')
+                loss = self.incorporateFeedback(state, action, +1, new_state, self.agent_index)
+                win_lost_list.append('win')
             else:
-                self.incorporateFeedback(state, action, 0, new_state, self.agent_index)
-                arr.append('draw')
+                loss = self.incorporateFeedback(state, action, 0, new_state, self.agent_index)
+                win_lost_list.append('draw')
+            loss_list.append(loss)
+            reward_list.append(total_num_eaten-total_num_lost)
             self.explorationProb -= self.eps_dif
             print("Finished Training number: " + str(i + 1) + " after " + str(counter) + " plays")
+            print("Reward is: " + str(total_num_eaten-total_num_lost) + ", loss value is: " + str(loss))
             print("Number of marble lost: " + str(total_num_lost) + ", Number of marble enemy lost: " + str( total_num_eaten))
-            print("Training winner is: QLearner" if board.get_looser() != self.agent_index else "Training winner is: enemy")
+            print("Training winner is: NNLearner" if board.get_looser() != self.agent_index else "Training winner is: enemy")
         print("Finished training!!!!!!!")
         self.explorationProb = 0.001
         file = open(
             './train/' + self.train_agent_str + '_hue_' + self.train_agent_hue + '_num_of_trains_' + str(
-                self.numTraining) + '_score.txt', 'w')
-        file.write(str(arr))
+                self.numTraining) + '_win_lost.txt', 'w')
+        file.write(str(win_lost_list))
         file.close()
-        saver = tf.train.Saver()
-        saver.save(self.sess, './train/'+self.train_agent_str+'_hue_'+ self.train_agent_hue +'_num_of_trains_'+ str(self.numTraining)+'_ts')
+        file = open(
+            './train/' + self.train_agent_str + '_hue_' + self.train_agent_hue + '_num_of_trains_' + str(
+                self.numTraining) + '_loss.txt', 'w')
+        file.write(str(loss_list))
+        file.close()
+        file = open(
+            './train/' + self.train_agent_str + '_hue_' + self.train_agent_hue + '_num_of_trains_' + str(
+                self.numTraining) + '_reward.txt', 'w')
+        file.write(str(reward_list))
+        file.close()
+        path = './train/'+self.train_agent_str+'_hue_'+ self.train_agent_hue +'_num_of_trains_'+ str(self.numTraining)+'_ts'
+        tf.saved_model.simple_save(self.sess,path+'/',{'input':self.input_placeholder},{'target':self.target_placeholder})
         if self._show_tk:
             board.stop()
 
@@ -183,11 +199,12 @@ class NN(BaseAgent):
 
         cur_features = self.toFeatureVector(state, action,player_index)
         target = reward
-        if not newState.get_looser():
-            # Use the static auxiliary weights as your target
-            target += self.discount * max(
-                [self.getQ(newState, action,player_index) for action in self.actions(newState,player_index)])
-
+        # if not newState.get_looser():
+        #     # Use the static auxiliary weights as your target
+        #     target += self.discount * max(
+        #         [self.getQ(newState, action,player_index) for action in self.actions(newState,player_index)])
+        # diff = reward - self.getQ(state, action, player_index)
+        # print (self.loss)
         if self.verbose:
             summary, _ = self.sess.run([self.merged, self.train_step],
                                        feed_dict={
@@ -197,11 +214,12 @@ class NN(BaseAgent):
             self.log_writer.add_summary(
                 summary, self.numIters)
         else:
-            self.sess.run([self.train_step],
+            _, loss_val = self.sess.run([self.train_step,self.loss],
                           feed_dict={
                               self.input_placeholder: cur_features,
                               self.target_placeholder: [[target]],
                           })
+            return loss_val
 
 
 
@@ -211,12 +229,10 @@ class NN(BaseAgent):
         :param player_index:
         """
         features = self.toFeatureVector(state, action, player_index)
-
+        dic = {self.input_placeholder: features}
         # output is a 1x1 matrix
         output = self.sess.run(self.output,
-            feed_dict={
-                self.input_placeholder: features,
-            })
+            feed_dict=dic)
 
         return output[0][0]
 
@@ -241,7 +257,7 @@ class NN(BaseAgent):
         fc_1 = tf.nn.sigmoid(fc_1)
 
         # training
-        loss = tf.reduce_sum(tf.square(fc_1 - targets))
+        loss = tf.reduce_sum(tf.square(fc_1 - targets), name="loss")
         # starter_learning_rate = 0.1
         # global_step = tf.Variable(0, trainable=False)
         # learning_rate = tf.train.exponential_decay(starter_learning_rate, global_step,
